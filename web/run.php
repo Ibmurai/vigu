@@ -12,4 +12,6 @@
  * @author   Bo Thinggaard <akimsko@tnactas.dk>
  */
 require_once dirname(__FILE__) . '/../lib/zaphod/src/Zaphod.php';
-Zaphod::run();
+require_once dirname(__FILE__) . '/../lib/frood/src/Frood/Configuration.php';
+require_once dirname(__FILE__) . '/../Configuration.php';
+Zaphod::run(new ViguConfiguration());
