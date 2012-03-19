@@ -1,0 +1,30 @@
+div[role=application] {
+	color: blue;
+	border: 1px solid blue;
+	margin: 0px;
+	padding: 0px;
+}
+
+div[role=toolbar] {
+	margin: 0px;
+	padding: 0px;
+}
+
+table[role=navigation] {
+	color: green;
+	float: left;
+	border: 1px solid green;
+	width: 50%;
+	margin: 0px;
+	padding: 0px;
+}
+
+div[role=document] {
+	margin: 0px;
+	color: purple;
+	float: right;
+	border: 1px solid purple;
+	width: 49%;
+	margin: 0px;
+	padding: 0px;
+}
