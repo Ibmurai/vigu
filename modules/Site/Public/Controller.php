@@ -24,7 +24,7 @@ class SitePublicController extends FroodController {
 	 *
 	 * @return void
 	 */
-	public function initialize() {
+	protected function initialize() {
 		parent::initialize();
 
 		$this->doOutputTwig();
