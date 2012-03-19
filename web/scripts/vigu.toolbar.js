@@ -11,12 +11,14 @@ Vigu.Toolbar = (function() {
 		 * 
 		 * @return {object}
 		 */
-		create : function(severity, message, count) {
+		create : function(title) {
 			var toolbar = jQuery('<div>').attr('role', 'toolbar')
 					.addClass('ui-widget-header ui-corner-all')
-					.append(Vigu.Toolbar.addFilterSelect('servers', Vigu.Toolbar.getServers()))
-					.append(Vigu.Toolbar.addFilterSelect('modules', Vigu.Toolbar.getModules()))
-					.append(Vigu.Toolbar.addFilterSelect('errors', Vigu.Toolbar.getGetErrors()));
+					.append(jQuery('<h1>').text(title))
+					.append(Vigu.Toolbar.addFilterSelect('sites'))
+					.append(Vigu.Toolbar.addFilterSelect('modules'))
+					.append(Vigu.Toolbar.addFilterSelect('errors'))
+					.append(Vigu.Toolbar.addSearch());
 			return toolbar;
 		},
 		/**
@@ -26,31 +28,64 @@ Vigu.Toolbar = (function() {
 		 */
 		addFilterSelect : function(id, options) {
 			var select = jQuery('<select>').attr('id', id);
-			return select.append(options);
+			switch(id) {
+			case 'sites' :
+				select = Vigu.Toolbar.addSites(select);
+				break;
+			case 'modules' :
+				select = Vigu.Toolbar.addModules(select);
+				break;
+			case 'errors' :
+				select = Vigu.Toolbar.addErrors(select);
+				break;
+			}
+			return select;
 		},
 		/**
 		 * Get modules
 		 * 
 		 * @return {object}
 		 */
-		getModules : function() {
-			return jQuery('<option>').text('Module 1');
+		addModules : function(select) {
+			///api/modules/get
+			select.append(jQuery('<option>').text('All modules'));
+			select.append(jQuery('<option>').text('Module 1'));
+			select.append(jQuery('<option>').text('Module 2'));
+			return select;
 		},
 		/**
 		 * Get server
 		 * 
 		 * @return {object}
 		 */
-		getServers : function() {
-			return jQuery('<option>').text('Server 1');
+		addSites : function(select) {
+			///api/sites/get
+			select.append(jQuery('<option>').text('All sites'));
+			select.append(jQuery('<option>').text('Site 1'));
+			select.append(jQuery('<option>').text('Site 2'));
+			return select;
 		},
 		/**
 		 * Get errors
 		 * 
 		 * @return {object}
 		 */
-		getGetErrors : function() {
-			return jQuery('<option>').text('Error 1');
+		addErrors : function(select) {
+			select.append(jQuery('<option>').text('All errors'));
+			select.append(jQuery('<option>').text('Fatal'));
+			select.append(jQuery('<option>').text('Error'));
+			select.append(jQuery('<option>').text('Warning'));
+			select.append(jQuery('<option>').text('Notice'));
+			select.append(jQuery('<option>').text('Deprecated'));
+			return select;
+		},
+		/**
+		 * Get errors
+		 * 
+		 * @return {object}
+		 */
+		addSearch : function() {
+			return jQuery('<input type="text">').addClass('ui-corner-all');
 		}
 	};
 })();

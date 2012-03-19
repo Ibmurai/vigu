@@ -9,7 +9,7 @@ Vigu = (function() {
 			create : function() {
 				var base = jQuery('<div>').attr('role', 'application');
 				base.appendTo('body');
-				jQuery('div[role="application"]').append(Vigu.Toolbar.create());
+				jQuery('div[role="application"]').append(Vigu.Toolbar.create('Vigu - You did this!'));
 				jQuery('div[role="application"]').append(Vigu.list());
 				jQuery('div[role="application"]').append(Vigu.Document.create());
 				jQuery('div[role="toolbar"] select').selectmenu();

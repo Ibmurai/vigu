@@ -2,6 +2,8 @@
 {% block js %}
 	{{ parent() }}
     <script src="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+    <script src="/scripts/grid.locale-en.js"></script>
+    <script src="/scripts/jquery.jqGrid.min.js"></script>
     <script src="/scripts/jquery.ui.selectmenu.js"></script>
 	<script src="/scripts/vigu.js"></script>
 	<script src="/scripts/vigu.entry.js"></script>
@@ -13,6 +15,7 @@
 	{{ parent() }}
     <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" href="/styles/jquery.ui.selectmenu.css">
+    <link rel="stylesheet" href="/styles/ui.jqgrid.css">
     <link rel="stylesheet" href="/styles/style.css">
 {% endblock %}
 {% block content %}{% endblock %}

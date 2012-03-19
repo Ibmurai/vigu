@@ -1,13 +1,37 @@
 div[role=application] {
-	color: blue;
-	border: 1px solid blue;
 	margin: 0px;
 	padding: 0px;
 }
 
 div[role=toolbar] {
 	margin: 0px;
-	padding: 0px;
+	padding: 2px;
+	height: 28px;
+}
+
+div[role=toolbar] h1 {
+	margin: 0px;
+	padding: 2px;
+	float: left;
+	font-size: 20px;
+}
+
+div[role=toolbar] input[type=text] {
+	margin: 0px;
+	padding: 2px;
+	float: right;
+	border: 1px solid #AAAAAA;
+	font-size: 16px;
+	height: 22px;
+}
+
+div[role=toolbar] select {
+	width: 150px;
+}
+
+div[role=toolbar] .ui-selectmenu {
+	float: right;
+	width: 100px;
 }
 
 table[role=navigation] {
@@ -27,4 +51,8 @@ div[role=document] {
 	width: 49%;
 	margin: 0px;
 	padding: 0px;
+}
+
+.ui-widget {
+	font-size: 12px;
 }
