@@ -6,7 +6,6 @@
 				 * The "constructor"
 				 */
 				init : function() {
-					console.log('init vigu');
 					f.setup();
 				},
 
@@ -17,7 +16,6 @@
 				 *            color The color to set.
 				 */
 				setup : function(color) {
-					console.log('setup vigu');
 					Vigu.create();
 				},
 

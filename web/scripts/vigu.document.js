@@ -4,10 +4,10 @@ if (typeof Vigu === 'undefined') {
 /**
  * Base object for all Vigu menu operations
  */
-Vigu.Document = (function() {
+Vigu.Document = (function($) {
 		return {
 			create : function(severity, message, count) {
 				return jQuery('<div>').attr('role', 'document').text('Display');
 			},
 		};
-})();
+})(jQuery);

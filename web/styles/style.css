@@ -34,7 +34,7 @@ div[role=toolbar] .ui-selectmenu {
 	width: 100px;
 }
 
-table[role=navigation] {
+table[role=list] {
 	color: green;
 	float: left;
 	border: 1px solid green;

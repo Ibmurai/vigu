@@ -17,72 +17,43 @@
  * @package    TODO_DOCUMENT_ME
  * @subpackage Class
  * @author     Jens Riisom Schultz <jers@fynskemedier.dk>
+ * @author     Johannes Skov Frandsen <jsf@fynskemedier.dk>
  */
 class ApiPublicControllerLog extends ApiPublicController {
 	/**
+	 * Grid search
 	 *
+	 * @param integer $rows   <100> Number of rows to return
+	 * @param integer $page   <1> Result offset
+	 * @param string  $sidx   <level> Field to sort by
+	 * @param string  $sord   <desc> Sort direction (asc or desc)
+	 * @param string  $module <null> Limit search to one module (default is null = all modules)
+	 * @param string  $site   <null> Limit search to one site (default is null = all sites)
+	 * @param string  $level  <null> Limit search to one error level (default is null = all levels)
+	 * @param string  $path   <null> Limit search to match a specific path (default is null = any file path)
+	 * @param string  $search <null> Limit search to match string in error message (default is null = any error message)
+	 * 
 	 * @return void
 	 */
-	public function searchAction() {
-		$lines = array(
-			array(
-				'message'    => 'FATAL LOLZ!',
-				'level'      => 'Fatal',
-				'file'       => 'lolz.php',
-				'module'     => 'xphoto',
-				'site'       => 'fyens.dk',
-				'line'       => 42,
-				'count'      => rand(42,4200),
-				'stacktrace' => debug_backtrace(),
-			),
-			array(
-				'message'    => 'Depped LOLZ!',
-				'level'      => 'Deprecated',
-				'file'       => 'rofl.php',
-				'module'     => 'xphoto',
-				'site'       => 'fyens.dk',
-				'line'       => 11117,
-				'count'      => rand(42,4200),
-				'stacktrace' => debug_backtrace(),
-			),
-			array(
-				'message'    => 'Need more beer.',
-				'level'      => 'Notice',
-				'file'       => 'beer.php',
-				'module'     => 'xphoto',
-				'site'       => 'fyens.dk',
-				'line'       => 1,
-				'count'      => rand(42,4200),
-				'stacktrace' => debug_backtrace(),
-			),
-			array(
-				'message'    => 'FATAL LOLZ!',
-				'level'      => 'Fatal',
-				'file'       => 'include/lolz.php',
-				'module'     => 'xphoto',
-				'site'       => 'fyens.dk',
-				'line'       => 43,
-				'count'      => rand(42,4200),
-				'stacktrace' => debug_backtrace(),
-			),
-			array(
-				'message'    => 'FATAL LOLZ!',
-				'level'      => 'Fatal',
-				'file'       => 'public/class/XphotoPronImage.php',
-				'module'     => 'xphoto',
-				'site'       => 'placeboobs.com',
-				'line'       => 142,
-				'count'      => rand(42,4200),
-				'stacktrace' => debug_backtrace(),
-			),
-		);
+	public function gridAction($rows, $page, $sidx, $sord, $module, $site, $level, $path, $search) {
+		//Do your magic here
+		
+		//This is a dummy implementaion which generate dummy data for testing 
+		$dummyMessage = array(1 => 'Its wrong I\'m telling you', 2 => 'Arhhhhh it hurts!', 3 => 'You can\'t be serious', 3 => 'Oh pleace don\'t do that');
+		$dummyLevel = array(2 => 'Error', 3 => 'Warning', 4 => 'Notice', 5 => 'Deprecated');
 
-		$newLines = array();
-		for ($i = 0; $i < 60; $i++) {
-			$newLines = array_merge($newLines, $lines);
+		$rows = array();
+		for ($i = 0; $i < 300; $i++) {
+			$message = $dummyMessage[array_rand($dummyMessage)];
+			$level = $dummyLevel[array_rand($dummyLevel)];
+			$errors  = rand(42, 4200);
+
+			$rows[$i]['id'] = $i + 1; //the unique id of the row
+			$rows[$i]['cell'] = array($level, $message, $errors); //an array that contains the data for a row
 		}
-
-		$this->assign('lines', $newLines);
+		$this->assign('total', 100);  // total pages for the query
+		$this->assign('page', 1);     // current page of the query
+		$this->assign('records', 300);// total number of records for the query
+		$this->assign('rows', $rows); // an array that contains the actual data
 	}
-
 }
