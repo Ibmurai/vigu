@@ -34,11 +34,7 @@ div[role=toolbar] .ui-selectmenu {
 	width: 100px;
 }
 
-table[role=list] {
-	color: green;
-	float: left;
-	border: 1px solid green;
-	width: 50%;
+table[role=grid] {
 	margin: 0px;
 	padding: 0px;
 }

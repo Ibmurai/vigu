@@ -33,14 +33,18 @@ Vigu.Grid = (function($) {
 			 */
 			search : ''
 		},
+		setup : function(node) {
+			jQuery('<table>').attr('role','grid').attr('id', 'grid').appendTo(node);
+			jQuery('<div>').attr('id', 'pager').appendTo(node);
+		},
 		/**
 		 * Setup the grid
 		 * 
 		 * @return undefined
 		 */
-		setup : function() {
-			
-			jQuery("[role='list']").jqGrid(
+		render : function() {
+			var gridHeight = $(window).height() - 125;
+			$("[role='grid']").jqGrid(
 					{
 						url : '/api/log/grid' + Vigu.Grid.queryString(),
 						datatype : "json",
@@ -60,8 +64,14 @@ Vigu.Grid = (function($) {
 						viewrecords: true, 
 						gridview: true,
 						hidegrid: false,
+						height: gridHeight,
 						caption : "Errors"
 					});
+			
+			$(window).bind('resize', function() {
+				$("#grid").setGridWidth(($("[role='application']").width() - 2) / 2, true);
+			}).trigger('resize');
+
 		},
 		/**
 		 * Construct the query string
