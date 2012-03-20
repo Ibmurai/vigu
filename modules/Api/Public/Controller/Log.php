@@ -26,53 +26,63 @@ class ApiPublicControllerLog extends ApiPublicController {
 	public function searchAction() {
 		$lines = array(
 			array(
-				'message' => 'FATAL LOLZ!',
-				'level' => 'Fatal',
-				'file' => 'lolz.php',
-				'module' => 'xphoto',
-				'site' => 'fyens.dk',
-				'line' => 42,
+				'message'    => 'FATAL LOLZ!',
+				'level'      => 'Fatal',
+				'file'       => 'lolz.php',
+				'module'     => 'xphoto',
+				'site'       => 'fyens.dk',
+				'line'       => 42,
+				'count'      => rand(42,4200),
 				'stacktrace' => debug_backtrace(),
 			),
 			array(
-				'message' => 'Depped LOLZ!',
-				'level' => 'Deprecated',
-				'file' => 'rofl.php',
-				'module' => 'xphoto',
-				'site' => 'fyens.dk',
-				'line' => 11117,
+				'message'    => 'Depped LOLZ!',
+				'level'      => 'Deprecated',
+				'file'       => 'rofl.php',
+				'module'     => 'xphoto',
+				'site'       => 'fyens.dk',
+				'line'       => 11117,
+				'count'      => rand(42,4200),
 				'stacktrace' => debug_backtrace(),
 			),
 			array(
-				'message' => 'Need more beer.',
-				'level' => 'Notice',
-				'file' => 'beer.php',
-				'module' => 'xphoto',
-				'site' => 'fyens.dk',
-				'line' => 1,
+				'message'    => 'Need more beer.',
+				'level'      => 'Notice',
+				'file'       => 'beer.php',
+				'module'     => 'xphoto',
+				'site'       => 'fyens.dk',
+				'line'       => 1,
+				'count'      => rand(42,4200),
 				'stacktrace' => debug_backtrace(),
 			),
 			array(
-				'message' => 'FATAL LOLZ!',
-				'level' => 'Fatal',
-				'file' => 'include/lolz.php',
-				'module' => 'xphoto',
-				'site' => 'fyens.dk',
-				'line' => 43,
+				'message'    => 'FATAL LOLZ!',
+				'level'      => 'Fatal',
+				'file'       => 'include/lolz.php',
+				'module'     => 'xphoto',
+				'site'       => 'fyens.dk',
+				'line'       => 43,
+				'count'      => rand(42,4200),
 				'stacktrace' => debug_backtrace(),
 			),
 			array(
-				'message' => 'FATAL LOLZ!',
-				'level' => 'Fatal',
-				'file' => 'public/class/XphotoPronImage.php',
-				'module' => 'xphoto',
-				'site' => 'placeboobs.com',
-				'line' => 142,
+				'message'    => 'FATAL LOLZ!',
+				'level'      => 'Fatal',
+				'file'       => 'public/class/XphotoPronImage.php',
+				'module'     => 'xphoto',
+				'site'       => 'placeboobs.com',
+				'line'       => 142,
+				'count'      => rand(42,4200),
 				'stacktrace' => debug_backtrace(),
 			),
 		);
 
-		$this->assign('lines', $lines);
+		$newLines = array();
+		for ($i = 0; $i < 60; $i++) {
+			$newLines = array_merge($newLines, $lines);
+		}
+
+		$this->assign('lines', $newLines);
 	}
 
 }
