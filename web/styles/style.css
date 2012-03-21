@@ -16,41 +16,73 @@ div[role=region] {
 	padding: 4px 0px 3px 5px;
 	font-size: 12px;
 }
-.context, .stacktrace {
-		margin: 5px 2px 2px 5px;
+
+.context,.stacktrace {
+	margin: 5px 2px 2px 5px;
 	padding: 4px 0px 3px 5px;
 	font-size: 12px;
 }
 
 div[role=region] div[role=heading] table {
-	margin: 0px;
+	margin: 5px 2px 2px 5px;
 	padding: 0px;
 	width: 100%;
 	border-spacing: 1px;
 }
 
-th div.Error {
-	background-image: url(/web/images/Error.png);
+div.errorLevel {
 	height: 75px;
 	width: 75px;
+	margin: 0px;
+	padding: 0px;
+	background-repeat: no-repeat;
+	background-position: center center;
+	
 }
 
-th div.Warning {
-	background-image: url(/web/images/Alert.png);
-	height: 75px;
+div.count {
 	width: 75px;
+	font-size: 16px;
+	line-height: 25px;
+	height: 25px;
+	margin: 0px;
+	padding: 0px;
+	text-align: center;
 }
 
-th div.Deprecated {
-	background-image: url(/web/images/Burn.png);
-	height: 75px;
-	width: 75px;
+div.icons {
+	float: left;
+}
+div.fields dl {
+	margin : 0px 5px 0px 55px; 
+	
+}
+div.fields dt {
+	font-weight: bold;
+	float: left; 
+	padding: 5px 0px 5px 0px;
+	width: 50px;
+	
+}
+div.fields dd {
+		padding: 5px 0px 5px 0px;
+		text-indent: 5px;
 }
 
-th div.Notice {
-	background-image: url(/web/images/Info.png);
-	height: 75px;
-	width: 75px;
+div.Error {
+	background-image: url(/web/images/error.png);
+}
+
+div.Warning {
+	background-image: url(/web/images/warning.png);
+}
+
+div.Deprecated {
+	background-image: url(/web/images/deprecated.png);
+}
+
+div.Notice {
+	background-image: url(/web/images/notice.png);
 }
 
 div[role=toolbar] {

@@ -62,7 +62,7 @@ Vigu.Grid = (function($) {
 						rowNum : 100,
 						rowList : [ 100, 200, 300 ],
 						pager : '#pager',
-						sortname : 'level',
+						sortname : 'timestamp',
 						viewrecords : true,
 						sortorder : "desc",
 						autowidth: true,
@@ -71,9 +71,13 @@ Vigu.Grid = (function($) {
 						hidegrid: false,
 						height: gridHeight,
 						caption : "Errors",
-					   onSelectRow: function(id) {
-						   Vigu.Document.display(id);
-						   },
+					    onSelectRow: function(id) {
+						   Vigu.rightColumn.append(Vigu.Document.render(id));
+						},
+						gridComplete: function() {
+							var firstIdOnPage = $("[role='grid']").getDataIDs()[0];
+							Vigu.rightColumn.append(Vigu.Document.render(firstIdOnPage));
+						},
 					});
 			
 			$(window).bind('resize', function() {

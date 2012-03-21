@@ -18,7 +18,6 @@ Vigu = (function($) {
 				this.rightColumn = $('<div>').attr('role', 'region');
 				this.application.append(this.leftColumn);
 				this.application.append(this.rightColumn);
-				this.rightColumn.append(Vigu.Document.create());
 				jQuery('div[role="toolbar"] select').selectmenu();
 				Vigu.Grid.setup(this.leftColumn);
 				Vigu.Grid.render();
