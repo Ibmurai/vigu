@@ -11,7 +11,7 @@ Vigu.Grid = (function($) {
 			 * Module to limit search by
 			 * @type String
 			 */
-			module : 'fsArticle		',
+			module : '',
 			/**
 			 * Site to limit search by
 			 * @type String
@@ -33,6 +33,9 @@ Vigu.Grid = (function($) {
 			 */
 			search : ''
 		},
+		/**
+		 * Setup the tags for the grid
+		 */
 		setup : function(node) {
 			jQuery('<table>').attr('role','grid').attr('id', 'grid').appendTo(node);
 			jQuery('<div>').attr('id', 'pager').appendTo(node);
@@ -43,15 +46,17 @@ Vigu.Grid = (function($) {
 		 * @return undefined
 		 */
 		render : function() {
-			var gridHeight = $(window).height() - 125;
+			var gridHeight = $(window).height() - 130;
 			$("[role='grid']").jqGrid(
 					{
 						url : '/api/log/grid' + Vigu.Grid.queryString(),
 						datatype : "json",
-						colNames : [ 'Level', 'Message', 'Count'],
-						colModel : [ {name : 'level', index : 'level', width : 55 }, 
-						             {name : 'message', index : 'message', width : 90 }, 
-						             {name : 'count', index : 'count', width : 100 }
+						colNames : [ 'Level', 'Message', 'Date', 'Count'],
+						colModel : [ 
+						             {name : 'level', index : 'level', width : 80, align: 'center', fixed : true }, 
+						             {name : 'message', index : 'message' }, 
+						             {name : 'timestamp', index : 'timestamp', width : 140 , fixed : true }, 
+						             {name : 'count', index : 'count', width : 50, align: 'center', fixed : true }
 						           ],
 						loadtext: 'Loading...',
 						rowNum : 100,
@@ -65,7 +70,10 @@ Vigu.Grid = (function($) {
 						gridview: true,
 						hidegrid: false,
 						height: gridHeight,
-						caption : "Errors"
+						caption : "Errors",
+					   onSelectRow: function(id) {
+						   Vigu.Document.display(id);
+						   },
 					});
 			
 			$(window).bind('resize', function() {

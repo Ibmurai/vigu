@@ -15,7 +15,7 @@ Vigu.Toolbar = (function() {
 			var toolbar = jQuery('<div>').attr('role', 'toolbar')
 					.addClass('ui-widget-header ui-corner-all')
 					.append(jQuery('<h1>').text(title))
-					.append(Vigu.Toolbar.addFilterSelect('sites'))
+					.append(Vigu.Toolbar.addFilterSelect('hosts'))
 					.append(Vigu.Toolbar.addFilterSelect('modules'))
 					.append(Vigu.Toolbar.addFilterSelect('errors'))
 					.append(Vigu.Toolbar.addSearch());
@@ -29,8 +29,8 @@ Vigu.Toolbar = (function() {
 		addFilterSelect : function(id, options) {
 			var select = jQuery('<select>').attr('id', id);
 			switch(id) {
-			case 'sites' :
-				select = Vigu.Toolbar.addSites(select);
+			case 'hosts' :
+				select = Vigu.Toolbar.addHosts(select);
 				break;
 			case 'modules' :
 				select = Vigu.Toolbar.addModules(select);
@@ -58,11 +58,11 @@ Vigu.Toolbar = (function() {
 		 * 
 		 * @return {object}
 		 */
-		addSites : function(select) {
+		addHosts : function(select) {
 			///api/sites/get
-			select.append(jQuery('<option>').text('All sites'));
-			select.append(jQuery('<option>').text('Site 1'));
-			select.append(jQuery('<option>').text('Site 2'));
+			select.append(jQuery('<option>').text('All hosts'));
+			select.append(jQuery('<option>').text('Host 1'));
+			select.append(jQuery('<option>').text('Host 2'));
 			return select;
 		},
 		/**
@@ -72,7 +72,6 @@ Vigu.Toolbar = (function() {
 		 */
 		addErrors : function(select) {
 			select.append(jQuery('<option>').text('All errors'));
-			select.append(jQuery('<option>').text('Fatal'));
 			select.append(jQuery('<option>').text('Error'));
 			select.append(jQuery('<option>').text('Warning'));
 			select.append(jQuery('<option>').text('Notice'));
