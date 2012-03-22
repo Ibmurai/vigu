@@ -16,7 +16,8 @@
 				 *            color The color to set.
 				 */
 				setup : function(color) {
-					Vigu.create();
+					Vigu.setup();
+					Vigu.render();
 				},
 
 				events : {

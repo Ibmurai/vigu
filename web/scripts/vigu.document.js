@@ -9,33 +9,35 @@ Vigu.Document = (function($) {
 			/**
 			 * Create the error document
 			 * 
+		     * @param {jQuery} Dom node
+			 * @param {Integer} Id of the document to render
+			 * 
 			 * @return {Object}
 			 */
-			render : function(id) {
+			render : function(node, id) {
 				$("[role=document]").remove();
-				console.log('new');
 				//var data = Vigu.Document.getData();
 				var data = Vigu.Document.dummyData();
 				var document = $('<div>').attr('role', 'document').addClass('ui-widget ui-widget-content ui-corner-all');
-				Vigu.Document.headerSection2(document, data.level, data.module, data.date, data.count, data.line, data.message, data.file);
+				Vigu.Document.headerSection2(document, data.level, data.module, data.first, data.count, data.line, data.message, data.file);
 				Vigu.Document.stacktraceSection(document, data.stacktrace);
 				Vigu.Document.contextSection(document, data.context);
-				return document;
+				document.appendTo(node);
 			},
 			/**
 			 * Generate the header block
 			 * 
 			 * @return undefined
 			 */
-			headerSection2 : function(node, level, module, date, count, line, message, file) {
+			headerSection2 : function(node, level, module, first, count, line, message, file) {
 				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text(level + ': ' + message)).appendTo(node);
 				left = $('<div>').addClass('icons').appendTo(node);
 				right = $('<div>').addClass('fields').appendTo(node);
 				$('<div>').addClass(level).addClass('errorLevel').appendTo(left);
 				$('<div>').addClass('count').text(count).appendTo(left);
 				dl = $('<dl>');
-				$('<dt>').text('Date').appendTo(dl);
-				$('<dd>').text(date).appendTo(dl);
+				$('<dt>').text('First').appendTo(dl);
+				$('<dd>').text(first).appendTo(dl);
 				$('<dt>').text('Module').appendTo(dl);
 				$('<dd>').text(module).appendTo(dl);
 				$('<dt>').text('File').appendTo(dl);
@@ -99,7 +101,10 @@ Vigu.Document = (function($) {
 					'level'      : 'Notice', 
 					'module'     : 'xphoto', 
 					'message'    : 'Unterminated string', 
-					'date'       : '2012-03-21 07:20', 
+					'first'      : '2012-03-03 22:45:16', 
+					'last'       : '2012-03-03 22:40:16', 
+					'ago'        :  42, 
+					'frequency'  :  42.45, 
 					'line'       : 4, 
 					'file'       : '/admin/class/XphotoAdminController/Folder.php', 
 					'count'      : 123456,

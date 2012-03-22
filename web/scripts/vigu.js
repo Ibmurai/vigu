@@ -6,20 +6,49 @@ if (typeof Vigu === 'undefined') {
  */
 Vigu = (function($) {
 		return {
+			/**
+			 * The main application
+			 * 
+			 * @type jQuery node
+			 */
 			application : undefined,
+			/**
+			 * The left column
+			 * 
+			 * @type jQuery node
+			 */
 			leftColumn : undefined,
+			/**
+			 * The right column
+			 * 
+			 * @type jQuery node
+			 */
 			rightColumn : undefined,
-			
-			create : function() {
+			/**
+			 * Create the vigu application
+			 * 
+			 * @return undefined
+			 */
+			setup : function() {
 				this.application = $('<div>').attr('role', 'application');
-				this.application.appendTo('body');
-				this.application.append(Vigu.Toolbar.create('Vigu - You did this!'));
-				this.leftColumn = $('<div>').attr('role', 'region');
+				this.leftColumn  = $('<div>').attr('role', 'region');
 				this.rightColumn = $('<div>').attr('role', 'region');
+				
+				Vigu.Toolbar.setup(this.application, 'Vigu - You did this!');
 				this.application.append(this.leftColumn);
 				this.application.append(this.rightColumn);
-				jQuery('div[role="toolbar"] select').selectmenu();
 				Vigu.Grid.setup(this.leftColumn);
+				this.application.appendTo('body');
+			},
+			/**
+			 * Render the UI
+			 * 
+			 * This needs to be done after the elements have been added to the DOM
+			 * 
+			 * @return undefined
+			 */
+			render : function() {
+				Vigu.Toolbar.render();
 				Vigu.Grid.render();
 			}
 		};
