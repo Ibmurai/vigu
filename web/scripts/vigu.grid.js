@@ -18,10 +18,10 @@ Vigu.Grid = (function($) {
 			 */
 			module : '',
 			/**
-			 * Site to limit search by
+			 * Host to limit search by
 			 * @type {String}
 			 */
-			site : '',
+			host : '',
 			/**
 			 * Error level to limit search by
 			 * @type {String}
@@ -50,6 +50,14 @@ Vigu.Grid = (function($) {
 			$('<div>').attr('id', 'pager').appendTo(node);
 		},
 		/**
+		 * reload the grid with updated query
+		 * 
+		 * @return undefined
+		 */
+		reload : function() {
+			$("#grid").jqGrid().setGridParam({url : '/api/log/grid' + Vigu.Grid.queryString()}).trigger("reloadGrid");
+		},
+		/**
 		 * Render the grid
 		 * 
 		 * @return undefined
@@ -62,9 +70,9 @@ Vigu.Grid = (function($) {
 						datatype : "json",
 						colNames : [ 'Level', 'Message', 'Last', 'Count'],
 						colModel : [ 
-						             {name : 'level',   index : 'level',   width : 80,  align: 'center', fixed : true, title : false}, 
-						             {name : 'message', index : 'message'}, 
-						             {name : 'last',    index : 'last',    width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter}, 
+						             {name : 'level',   index : 'level',   width : 80,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter}, 
+						             {name : 'message', index : 'message', classes : 'messageGrid'}, 
+						             {name : 'timestamp',    index : 'timestamp',    width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter}, 
 						             {name : 'count',   index : 'count',   width : 50,  align: 'center', fixed : true, title : false}
 						           ],
 						loadtext: 'Loading...',
@@ -93,6 +101,20 @@ Vigu.Grid = (function($) {
 				$("#grid").setGridWidth(($("[role='application']").width() - 2) / 2, true);
 			}).trigger('resize');
 
+		},
+		/**
+		 * Formats the level
+		 * 
+		 * @param {String} cellvalue The value to be formatted
+		 * @param {Object} options   Containing the row id adn column id
+		 * @param {Object} rowObject Is a row data represented in the format determined from datatype option
+		 * 
+		 * @return {String}
+		 * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:custom_formatter
+		 */
+		levelFormatter : function(cellvalue, options, rowObject) {
+			var lower = cellvalue.toLowerCase();
+			return '<span class="'+ lower +'">' + lower.charAt(0).toUpperCase() + lower.slice(1) + '</span>';
 		},
 		/**
 		 * Formats the date

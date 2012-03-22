@@ -7,6 +7,7 @@
  * @category TODO_DOCUMENT_ME
  * @package  TODO_DOCUMENT_ME
  * @author   Jens Riisom Schultz <jers@fynskemedier.dk>
+ * @author   Johannes Skov Frandsen <jsf@fynskemedier.dk>
  * @since    2012-TODO-
  */
 require __DIR__ . '/../../../../handlers/shutdown.php';
@@ -51,6 +52,19 @@ class ApiPublicControllerLog extends ApiPublicController {
 				->where('l._host = :host')
 				->setParameter('host', $host)
 			;
+		}
+		if ($level !== null) {
+			if ($host !== null) {
+				$query
+					->andWhere('l._level = :level')
+					->setParameter('level', $level)
+				;
+			} else {
+				$query
+					->where('l._level = :level')
+					->setParameter('level', $level)
+				;
+			}
 		}
 
 		$countQuery = clone $query;

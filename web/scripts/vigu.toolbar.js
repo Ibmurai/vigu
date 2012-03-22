@@ -17,12 +17,12 @@ Vigu.Toolbar = (function($) {
 		setup : function(node , title) {
 			var toolbar = $('<div>').attr('role', 'toolbar')
 					.addClass('ui-widget-header ui-corner-all')
-					.append($('<h1>').text(title))
-					.append(this.addSearch());
+					.append($('<h1>').text(title));
 			toolbar.appendTo(node);
 			this.addFilterSelect(toolbar, 'hosts');
 			//this.addFilterSelect(toolbar, 'modules');
 			this.addFilterSelect(toolbar, 'levels');
+			//this.addSearch(toolbar);
 		},
 		/**
 		 * Render the toolbar
@@ -82,15 +82,17 @@ Vigu.Toolbar = (function($) {
 				dataType : 'json',
 				success : function(data) {
 					var select = $('<select>').attr('name', 'host');
-					select.append($('<option>').attr('value', 'all').text('Any host'));
 					for (host in data['hosts']) {
 							if (data['hosts'][host] == '') {
-								select.append($('<option>').attr('value', data['hosts'][host]).text('No host'));
+								select.append($('<option>').attr('value', data['hosts'][host]).text('Any host'));
 							} else {
 								select.append($('<option>').attr('value', data['hosts'][host]).text(data['hosts'][host]));
 							}
 					}
-					select.appendTo(node);
+					select.change(function() {
+						Vigu.Grid.parameters.host = select.val();
+						Vigu.Grid.reload();
+					}).appendTo(node);
 					select.selectmenu();
 				}
 			});
@@ -108,11 +110,15 @@ Vigu.Toolbar = (function($) {
 				dataType : 'json',
 				success : function(data) {
 					var select = $('<select>').attr('name', 'errorlevel');
-					select.append($('<option>').attr('value', 'all').text('Any error'));
+					select.append($('<option>').attr('value', '').text('Any error'));
 					for (level in data['levels']) {
-						select.append($('<option>').attr('value', data['levels'][level]).text(data['levels'][level]));
+						var ucfirst = data['levels'][level].charAt(0).toUpperCase() + data['levels'][level].slice(1).toLowerCase();
+						select.append($('<option>').attr('value', data['levels'][level]).text(ucfirst));
 					}
-					select.appendTo(node);
+					select.change(function() {
+						Vigu.Grid.parameters.level = select.val();
+						Vigu.Grid.reload();
+					}).appendTo(node);
 					select.selectmenu();
 				}
 			});
@@ -120,10 +126,12 @@ Vigu.Toolbar = (function($) {
 		/**
 		 * Get errors
 		 * 
-		 * @return {object}
+		 * @param {jQuery} node Node
+		 * 
+		 * @return {undefiend}
 		 */
-		addSearch : function() {
-			return $('<input type="text">').addClass('ui-corner-all');
+		addSearch : function(node) {
+			$('<input type="text">').addClass('ui-corner-all').appendTo(node);
 		}
 	};
 })(jQuery);

@@ -15,6 +15,13 @@ div[role=region] {
 	margin: 5px 2px 2px 5px;
 	padding: 4px 0px 3px 5px;
 	font-size: 12px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.messageGrid {
+	text-overflow: ellipsis;
 }
 
 .context,.stacktrace {
@@ -37,7 +44,6 @@ div.errorLevel {
 	padding: 0px;
 	background-repeat: no-repeat;
 	background-position: center center;
-	
 }
 
 div.count {
@@ -53,20 +59,24 @@ div.count {
 div.icons {
 	float: left;
 }
+
 div.fields dl {
-	margin : 0px 5px 0px 55px; 
-	
+	margin: 0px 5px 0px 55px;
 }
+
 div.fields dt {
 	font-weight: bold;
-	float: left; 
+	float: left;
 	padding: 5px 0px 5px 0px;
 	width: 50px;
-	
 }
+
 div.fields dd {
-		padding: 5px 0px 5px 0px;
-		text-indent: 5px;
+	padding: 5px 0px 5px 0px;
+	text-indent: 5px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
 }
 
 div.error {
