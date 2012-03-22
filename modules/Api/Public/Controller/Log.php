@@ -135,7 +135,6 @@ class ApiPublicControllerLog extends ApiPublicController {
 				'host'       => $logLine->getHost(),
 				'last'       => date('Y-m-d H:i:s', $timestampMax),
 				'first'      => date('Y-m-d H:i:s', $timestampMin),
-				'ago'        => time() - $timestampMax,
 				'level'      => $logLine->getLevel(),
 				'message'    => $logLine->getMessage(),
 				'file'       => $logLine->getFile(),
@@ -143,7 +142,7 @@ class ApiPublicControllerLog extends ApiPublicController {
 				'context'    => $logLine->getContext(),
 				'stacktrace' => $logLine->getStacktrace(),
 				'count'      => (integer) $count,
-				'frequency'  => ($count / ($timestampMax - $timestampMin)) * 3600,
+				'frequency'  => ($count / (max(1, $timestampMax - $timestampMin))) * 3600,
 			));
 		} catch (Doctrine\ORM\NoResultException $ex) {
 			$this->assign('error', 'No log lines found.');
