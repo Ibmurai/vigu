@@ -18,11 +18,11 @@ Vigu.Toolbar = (function($) {
 			var toolbar = $('<div>').attr('role', 'toolbar')
 					.addClass('ui-widget-header ui-corner-all')
 					.append($('<h1>').text(title))
-					.append(this.addFilterSelect('hosts'))
-					.append(this.addFilterSelect('modules'))
-					.append(this.addFilterSelect('errors'))
 					.append(this.addSearch());
 			toolbar.appendTo(node);
+			this.addFilterSelect(toolbar, 'hosts');
+			//this.addFilterSelect(toolbar, 'modules');
+			this.addFilterSelect(toolbar, 'levels');
 		},
 		/**
 		 * Render the toolbar
@@ -30,25 +30,26 @@ Vigu.Toolbar = (function($) {
 		 * @return undefined
 		 */
 		render : function () {
-			$('div[role="toolbar"] select').selectmenu();
+			//$('div[role="toolbar"] select').selectmenu();
 		},
 		/**
 		 * Add filter select
 		 * 
+		 * @param {jQuery} Node
 		 * @param {string} Id of the select to create
 		 * 
 		 * @return {object}
 		 */
-		addFilterSelect : function(id) {
+		addFilterSelect : function(node, id) {
 			switch(id) {
 			case 'hosts' :
-				select = this.addHosts();
+				select = this.addHosts(node);
 				break;
 			case 'modules' :
-				select = this.addModules();
+				select = this.addModules(node);
 				break;
-			case 'errors' :
-				select = this.addErrors();
+			case 'levels' :
+				select = this.addlevels(node);
 				break;
 			}
 			return select;
@@ -56,42 +57,65 @@ Vigu.Toolbar = (function($) {
 		/**
 		 * Get modules
 		 * 
+		 * @param {jQuery} node Node
+		 * 
 		 * @return {object}
 		 */
-		addModules : function() {
-			///api/modules/get
+		addModules : function(node) {
 			var select = $('<select>').attr('name', 'module');
 			select.append($('<option>').text('All modules'));
 			select.append($('<option>').text('Module 1'));
 			select.append($('<option>').text('Module 2'));
-			return select;
+			select.appendTo(node);
+			select.selectmenu();
 		},
 		/**
 		 * Get server
 		 * 
-		 * @return {object}
+		 * @param {jQuery} node Node
+		 * 
+		 * @return {undefiend}
 		 */
-		addHosts : function() {
-			///api/sites/get
-			var select = $('<select>').attr('name', 'host');
-			select.append($('<option>').text('All hosts'));
-			select.append($('<option>').text('Host 1'));
-			select.append($('<option>').text('Host 2'));
-			return select;
+		addHosts : function(node) {
+			$.ajax({
+				url : '/api/log/gethosts',
+				dataType : 'json',
+				success : function(data) {
+					var select = $('<select>').attr('name', 'host');
+					select.append($('<option>').attr('value', 'all').text('Any host'));
+					for (host in data['hosts']) {
+							if (data['hosts'][host] == '') {
+								select.append($('<option>').attr('value', data['hosts'][host]).text('No host'));
+							} else {
+								select.append($('<option>').attr('value', data['hosts'][host]).text(data['hosts'][host]));
+							}
+					}
+					select.appendTo(node);
+					select.selectmenu();
+				}
+			});
 		},
 		/**
-		 * Get errors
+		 * Get error levels
 		 * 
-		 * @return {object}
+		 * @param {jQuery} node Node
+		 * 
+		 * @return {undefiend}
 		 */
-		addErrors : function() {
-			var select = $('<select>').attr('name', 'errorlevel');
-			select.append($('<option>').text('All errors'));
-			select.append($('<option>').text('Error'));
-			select.append($('<option>').text('Warning'));
-			select.append($('<option>').text('Notice'));
-			select.append($('<option>').text('Deprecated'));
-			return select;
+		addlevels : function(node) {
+			$.ajax({
+				url : '/api/log/getlevels',
+				dataType : 'json',
+				success : function(data) {
+					var select = $('<select>').attr('name', 'errorlevel');
+					select.append($('<option>').attr('value', 'all').text('Any error'));
+					for (level in data['levels']) {
+						select.append($('<option>').attr('value', data['levels'][level]).text(data['levels'][level]));
+					}
+					select.appendTo(node);
+					select.selectmenu();
+				}
+			});
 		},
 		/**
 		 * Get errors

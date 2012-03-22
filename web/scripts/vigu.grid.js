@@ -60,18 +60,18 @@ Vigu.Grid = (function($) {
 					{
 						url : '/api/log/grid' + Vigu.Grid.queryString(),
 						datatype : "json",
-						colNames : [ 'Level', 'Message', 'Ago', 'Count'],
+						colNames : [ 'Level', 'Message', 'Last', 'Count'],
 						colModel : [ 
-						             {name : 'level', index : 'level', width : 80, align: 'center', fixed : true }, 
-						             {name : 'message', index : 'message' }, 
-						             {name : 'last', index : 'last', width : 140 , align: 'center', fixed : true.constructor, formatter : Vigu.Grid.agoFormatter }, 
-						             {name : 'count', index : 'count', width : 50, align: 'center', fixed : true }
+						             {name : 'level',   index : 'level',   width : 80,  align: 'center', fixed : true, title : false}, 
+						             {name : 'message', index : 'message'}, 
+						             {name : 'last',    index : 'last',    width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter}, 
+						             {name : 'count',   index : 'count',   width : 50,  align: 'center', fixed : true, title : false}
 						           ],
 						loadtext: 'Loading...',
-						rowNum : 100,
-						rowList : [ 100, 200, 300 ],
+						rowNum : 50,
+						rowList : [ 50, 100, 150 ],
 						pager : '#pager',
-						sortname : 'timestamp',
+						sortname : 'level',
 						viewrecords : true,
 						sortorder : "desc",
 						autowidth: true,

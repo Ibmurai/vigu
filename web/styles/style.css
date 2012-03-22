@@ -69,19 +69,19 @@ div.fields dd {
 		text-indent: 5px;
 }
 
-div.Error {
+div.error {
 	background-image: url(/web/images/error.png);
 }
 
-div.Warning {
+div.warning {
 	background-image: url(/web/images/warning.png);
 }
 
-div.Deprecated {
+div.deprecated {
 	background-image: url(/web/images/deprecated.png);
 }
 
-div.Notice {
+div.notice {
 	background-image: url(/web/images/notice.png);
 }
 

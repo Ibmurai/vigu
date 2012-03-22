@@ -15,14 +15,26 @@ Vigu.Document = (function($) {
 			 * @return {Object}
 			 */
 			render : function(node, id) {
-				$("[role=document]").remove();
-				//var data = Vigu.Document.getData();
-				var data = Vigu.Document.dummyData();
-				var document = $('<div>').attr('role', 'document').addClass('ui-widget ui-widget-content ui-corner-all');
-				Vigu.Document.headerSection2(document, data.level, data.module, data.first, data.count, data.line, data.message, data.file);
-				Vigu.Document.stacktraceSection(document, data.stacktrace);
-				Vigu.Document.contextSection(document, data.context);
-				document.appendTo(node);
+				$.ajax({
+					url : '/api/log/details',
+					dataType : 'json',
+					data : {
+						id : id
+					},
+					success : function(data) {
+						console.log(data);
+						$("[role=document]").remove();
+						var data = data['details'];
+						//var data = Vigu.Document.dummyData();
+						var document = $('<div>').attr('role', 'document').addClass('ui-widget ui-widget-content ui-corner-all');
+						Vigu.Document.headerSection2(document, data.level, data.module, data.first, data.count, data.line, data.message, data.file);
+						Vigu.Document.stacktraceSection(document, data.stacktrace);
+						Vigu.Document.contextSection(document, data.context);
+						document.appendTo(node);
+					}
+				});
+				
+				
 			},
 			/**
 			 * Generate the header block
@@ -33,13 +45,17 @@ Vigu.Document = (function($) {
 				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text(level + ': ' + message)).appendTo(node);
 				left = $('<div>').addClass('icons').appendTo(node);
 				right = $('<div>').addClass('fields').appendTo(node);
-				$('<div>').addClass(level).addClass('errorLevel').appendTo(left);
+				$('<div>').addClass(level.toLowerCase()).addClass('errorLevel').appendTo(left);
 				$('<div>').addClass('count').text(count).appendTo(left);
 				dl = $('<dl>');
 				$('<dt>').text('First').appendTo(dl);
-				$('<dd>').text(first).appendTo(dl);
+				$('<dd>').text(first).appendTo(dl); 
 				$('<dt>').text('Module').appendTo(dl);
-				$('<dd>').text(module).appendTo(dl);
+				if (module) {
+					$('<dd>').text(module).appendTo(dl);
+				} else {
+					$('<dd>').text('<no module>').appendTo(dl);
+				}
 				$('<dt>').text('File').appendTo(dl);
 				$('<dd>').text(file).appendTo(dl);
 				$('<dt>').text('Line').appendTo(dl);
@@ -74,8 +90,8 @@ Vigu.Document = (function($) {
 			 */
 			stacktraceSection : function(node, stacktrace) {
 				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text('Stacktrace')).appendTo(node);
-				var content = $('<div>').addClass('stacktrace').text(stacktrace);
-				content.appendTo(node);
+				node.append($('<div>').addClass('stacktrace').text(stacktrace));
+				
 			},
 			/**
 			 * Generate the context block
@@ -84,8 +100,7 @@ Vigu.Document = (function($) {
 			 */
 			contextSection : function(node, context) {
 				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text('Context')).appendTo(node);
-				var content = $('<div>').addClass('context').text(context);
-				content.appendTo(node);
+				node.append($('<div>').addClass('context').text(context));
 			},
 			addHeaderField : function(node, key, value) {
 				$('<th>').addClass('').text(key).appendTo(node);
