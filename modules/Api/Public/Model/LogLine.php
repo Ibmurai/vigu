@@ -2,6 +2,13 @@
 
 /**
  * @Entity
+ * @Table(name="log",
+ *        uniqueConstraints={@UniqueConstraint(name="PRIMARY",columns={"id"})},
+ *        indexes={
+ *           @Index(name="level_file_line",columns={"level","file","line"}),
+ *           @Index(name="host",columns={"host"})
+ *        }
+ * )
  */
 class ApiPublicModelLogLine extends ApiPublicModel {
 	/**
@@ -9,56 +16,63 @@ class ApiPublicModelLogLine extends ApiPublicModel {
 	 *
 	 * @Id
 	 * @GeneratedValue
-	 * @Column(type="integer")
+	 * @Column(name="id",type="integer")
 	 */
 	private $_id;
 
 	/**
 	 * @var string
 	 *
-	 * @Column(type="text")
+	 * @Column(name="message",type="text")
 	 */
 	private $_message;
 
 	/**
 	 * @var string
 	 *
-	 * @Column(type="text")
+	 * @Column(name="level",type="text")
 	 */
 	private $_level;
 
 	/**
 	 * @var integer
 	 *
-	 * @Column(type="integer")
+	 * @Column(name="timestamp",type="integer")
 	 */
 	private $_timestamp;
 
 	/**
 	 * @var string
 	 *
-	 * @Column(type="text")
+	 * @Column(name="file",type="text")
 	 */
 	private $_file;
 
 	/**
 	 * @var integer
 	 *
-	 * @Column(type="integer")
+	 * @Column(name="line",type="integer")
 	 */
 	private $_line;
 
 	/**
+	 * @var string
+	 *
+	 * @Column(name="host",type="text")
+	 */
+	private $_host;
+
+	/**
 	 * @var array
 	 *
-	 * @Column(type="array")
+	 * @Column(name="context",type="array")
 	 */
 	private $_context;
 
 	/**
 	 * @var array
 	 *
-	 * @Column(type="array")
+	 * @Column(name="stacktrace",type="array")
 	 */
 	private $_stacktrace;
 
@@ -68,7 +82,7 @@ class ApiPublicModelLogLine extends ApiPublicModel {
 	 * @return integer
 	 */
 	public function getId() {
-		return $_id;
+		return $this->_id;
 	}
 
 	/**
@@ -177,6 +191,28 @@ class ApiPublicModelLogLine extends ApiPublicModel {
 	 */
 	public function setLine($line) {
 		$this->_line = $line;
+
+		return $this;
+	}
+
+	/**
+	 * Get the host.
+	 *
+	 * @return string
+	 */
+	public function getHost() {
+		return $this->_host;
+	}
+
+	/**
+	 * Set the host.
+	 *
+	 * @param string $host
+	 *
+	 * @return ApiPublicModelLogLine This.
+	 */
+	public function setHost($host) {
+		$this->_host = $host;
 
 		return $this;
 	}

@@ -54,6 +54,26 @@ class ViguErrorHandler {
 	}
 
 	/**
+	 * Handle any uncaught exceptions.
+	 *
+	 * @param Exception $exception
+	 *
+	 * @return void
+	 */
+	public static function exception(Exception $exception) {
+		self::_logError(
+			E_ERROR,
+			'Uncaught ' . get_class($exception) . ': ' . $exception->getMessage(),
+			$exception->getFile(),
+			$exception->getLine(),
+			array(),
+			$exception->getTrace()
+		);
+
+		throw $exception;
+	}
+
+	/**
 	 * Convert an error number to a string.
 	 *
 	 * @param integer $errno
@@ -62,7 +82,12 @@ class ViguErrorHandler {
 	 */
 	private static function _errnoToString($errno) {
 		switch($errno) {
-			case E_ERROR:
+			// Default
+			default:
+				return 'UNKNOWN';
+
+			// PHP 5.2+ error types
+			case E_ERROR :
 				return 'ERROR';
 			case E_WARNING:
 				return 'WARNING';
@@ -88,12 +113,12 @@ class ViguErrorHandler {
 				return 'STRICT';
 			case E_RECOVERABLE_ERROR:
 				return 'RECOVERABLE ERROR';
-			case E_DEPRECATED:
+
+			// PHP 5.3+ only
+			case defined('E_DEPRECATED') ? E_DEPRECATED : 10000000 :
 				return 'DEPRECATED';
-			case E_USER_DEPRECATED:
+			case defined('E_USER_DEPRECATED') ? E_USER_DEPRECATED : 10000000 :
 				return 'USER DEPRECATED';
-			default:
-				return 'UNKNOWN';
 		}
 	}
 
@@ -111,6 +136,7 @@ class ViguErrorHandler {
 		array_shift($stacktrace);
 
 		self::$_log[] = array(
+			'host'       => isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'Unknown',
 			'timestamp'  => time(),
 			'level'      => self::_errnoToString($errno),
 			'message'    => $message,
@@ -157,3 +183,4 @@ class ViguErrorHandler {
 
 register_shutdown_function('ViguErrorHandler::shutdown');
 set_error_handler('ViguErrorHandler::error');
+set_exception_handler('ViguErrorHandler::exception');
