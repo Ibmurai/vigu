@@ -74,12 +74,19 @@ Vigu.Document = (function($) {
 			stacktraceSection : function(node, stacktrace) {
 				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text('Stacktrace')).appendTo(node);
 				trace = $('<div>').addClass('stacktrace');
-				for (line in stacktrace) {
-					var path = stacktrace[line]['file'];
-					if (path != undefined) {
-						var lineNumber = stacktrace[line]['line'];
-						$('<p>').text(path + ' : ' + lineNumber).appendTo(trace);
+				if (stacktrace.length != 0) {
+					for (line in stacktrace) {
+						var path = stacktrace[line]['file'];
+						if (path != undefined) {
+							var pathName = $('<span>').addClass('pathField').text('').append($('<span>').addClass('pathName').text(stacktrace[line]['file']));
+							var className = $('<span>').addClass('classField').text(' in ').append($('<span>').addClass('className').text(stacktrace[line]['class']));
+							var functionName = $('<span>').addClass('functionField').text('::').append($('<span>').addClass('functionName').text(stacktrace[line]['function'] + '()'));
+							var lineNumber = $('<span>').addClass('lineField').text(' on line ').append($('<span>').addClass('lineNumber').text(stacktrace[line]['line']));
+							$('<p>').addClass('trace').append(pathName).append(className).append(functionName).append(lineNumber).appendTo(trace);
+						}
 					}
+				} else {
+					$('<p>').text('No stacktrace available').appendTo(trace);
 				}
 				node.append(trace);
 			},
@@ -93,7 +100,16 @@ Vigu.Document = (function($) {
 			 */
 			contextSection : function(node, context) {
 				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text('Context')).appendTo(node);
-				node.append($('<div>').addClass('context').text(context));
+				contextSection = $('<div>').addClass('context');
+				if (context.length != 0) {
+					for (key in context) {
+						var varName = $('<span>').addClass('varName').text(key + ' : ').append($('<span>').addClass('varValue').text(context[key]));
+						$('<p>').append(varName).appendTo(contextSection);
+					}
+				} else {
+					$('<p>').text('No context available').appendTo(contextSection);
+				}
+				node.append(contextSection);
 			}
 		};
 })(jQuery);

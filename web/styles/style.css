@@ -24,6 +24,53 @@ div[role=region] {
 	text-overflow: ellipsis;
 }
 
+.trace {
+	font-family: monospace;
+}
+
+.lineField {
+	
+}
+
+.classField {
+	
+}
+
+.pathField {
+	
+}
+.functionField {
+	
+}
+.functionName {
+		font-weight: bold;
+	color: fuchsia;
+}
+
+.varName {
+	font-weight: bold;
+}
+
+.varValue {
+	font-weight: bold;
+	color: green;
+}
+
+.pathName {
+	font-weight: bold;
+	color: green;
+}
+
+.lineNumber {
+	font-weight: bold;
+	color: blue;
+}
+
+.className {
+	font-weight: bold;
+	color: purple;
+}
+
 .context,.stacktrace {
 	margin: 5px 2px 2px 5px;
 	padding: 4px 0px 3px 5px;

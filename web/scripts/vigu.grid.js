@@ -70,10 +70,10 @@ Vigu.Grid = (function($) {
 						datatype : "json",
 						colNames : [ 'Level', 'Message', 'Last', 'Count'],
 						colModel : [ 
-						             {name : 'level',   index : 'level',   width : 80,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter}, 
-						             {name : 'message', index : 'message', classes : 'messageGrid'}, 
-						             {name : 'timestamp',    index : 'timestamp',    width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter}, 
-						             {name : 'count',   index : 'count',   width : 50,  align: 'center', fixed : true, title : false}
+						             {name : 'level',     index : 'level',     resizable : false, width : 80,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter}, 
+						             {name : 'message',   index : 'message',   classes : 'messageGrid'}, 
+						             {name : 'timestamp', index : 'timestamp', resizable : false, width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter}, 
+						             {name : 'count',     index : 'count',     resizable : false, width : 50,  align: 'center', fixed : true, title : false}
 						           ],
 						loadtext: 'Loading...',
 						rowNum : 50,
