@@ -29,18 +29,18 @@ div[role=region] {
 }
 
 .lineField {
-	
+
 }
 
 .classField {
-	
+
 }
 
 .pathField {
-	
+
 }
 .functionField {
-	
+
 }
 .functionName {
 		font-weight: bold;
@@ -127,19 +127,19 @@ div.fields dd {
 }
 
 div.error {
-	background-image: url(/web/images/error.png);
+	background-image: url(/images/error.png);
 }
 
 div.warning {
-	background-image: url(/web/images/warning.png);
+	background-image: url(/images/warning.png);
 }
 
 div.deprecated {
-	background-image: url(/web/images/deprecated.png);
+	background-image: url(/images/deprecated.png);
 }
 
 div.notice {
-	background-image: url(/web/images/notice.png);
+	background-image: url(/images/notice.png);
 }
 
 div[role=toolbar] {
