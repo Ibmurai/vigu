@@ -445,7 +445,7 @@
    -->
 
    <field name="id" type="string" indexed="true" stored="true" required="true" />
-   <field name="globalSearch" type="text_general" indexed="true" />
+   <field name="globalSearch" type="text_general" indexed="true" multiValued="true" />
 
    <!-- Dynamic field definitions.  If a field name is not found, dynamicFields
         will be used if the name matches any of the patterns.
