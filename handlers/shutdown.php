@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * Include this file through php.ini to gather errors from a server.
+ */
 class ViguErrorHandler {
 	/**
 	 * Contains all logged errors.

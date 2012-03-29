@@ -1,37 +1,43 @@
-Zaphod
-======
+Vigu
+====
 
-*Authors* [Jens Riisom Schultz](mailto:ibber_of_crew42@hotmail.com), [Bo Thinggaard](akimsko@tnactas.dk)
-*Since*   2011-12-19
+*Authors* [Jens Riisom Schultz](mailto:ibber_of_crew42@hotmail.com), [Johannes Skov Frandsen](mailto:jsf@fynskemedier.dk)
+*Since*   2012-03-20
 
-Zaphod is a distribution of [The Frood VC framework](https://github.com/Ibmurai/frood).
+Vigu is a PHP error aggregation system, which collects all possible PHP errors and aggregates them in a Redis database. It includes a frontend to browse the data.
+
+This application is based on [Redis](http://redis.io) and The [Zaphod distribution](https://github.com/Ibmurai/zaphod) of [The Frood VC framework](https://github.com/Ibmurai/frood).
 
 
 Requirements
 ------------
 
-  * You need mod_rewrite.
-  * The `pecl_http` extension must be installed for HTTP remoting to work. You probably won't need this.
+  * You need apache mod_rewrite.
+  * You need the `pecl_http` PHP extension.
+  * You need the [`phpredis`](https://github.com/nicolasff/phpredis) PHP extension.
+  * You need a Redis server, dedicated to this application.
 
 
 Documentation
 -------------
 
-Coming soon... ;)
+  * Point your browser to the root of the site, to start browsing errors.
 
 
 Installing
 ----------
 
-  * Clone zaphod from git.
+  * Clone vigu from git.
   * Run `install.php` from command line.
-  * If you have PHP 5.4 and are on a *nix box, run `serve.sh` from a shell - this will start the [built in webserver](http://php.net/manual/en/features.commandline.webserver.php) on port 8000 of localhost. See it work by going to [`http://localhost:8000/lolmodule`](http://localhost:8000/lolmodule).
+  * Copy `config.inc.dist` to `config.inc` and edit it.
+  * Make a vhost, to point at the root of vigu or the `web/` folder.
+  * Include handlers/shutdown.php before anything else, preferably through php.ini.
 
 
 License
 -------
 
-Copyright 2011 Jens Riisom Schultz
+Copyright 2012 Jens Riisom Schultz
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
