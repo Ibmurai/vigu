@@ -29,9 +29,10 @@ Installing
 
   * Clone vigu from git.
   * Run `install.php` from command line.
-  * Copy `config.inc.dist` to `config.inc` and edit it.
-  * Make a vhost, to point at the root of vigu or the `web/` folder.
-  * Include handlers/shutdown.php before anything else, preferably through php.ini.
+  * Copy `vigu.ini.dist` to `vigu.ini` and edit it.
+  * Make a vhost, to point at the root of vigu or the `web/` folder, or however you choose to serve the site.
+  * Copy `handlers/shutdown.ini.dist` to `handlers/shutdown.ini` and edit it.
+  * Include `handlers/shutdown.php` before anything else, preferably through php.ini's `auto_prepend_file` directive. It has no dependencies besides it's configuration file, which must exist next to it, so you can safely deploy it alone, to all your servers.
 
 
 License

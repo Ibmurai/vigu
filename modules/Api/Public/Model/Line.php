@@ -410,7 +410,7 @@ class ApiPublicModelLine extends ApiPublicModel {
 	 */
 	private static function _getRedis() {
 		$redis = new Redis();
-		if (!$redis->connect('localhost', 6379)) {
+		if (!$redis->connect(self::_config('host'), self::_config('port'), self::_config('timeout'))) {
 			throw new RuntimeException("Could not connect to Redis server.");
 		}
 		$redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
