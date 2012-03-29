@@ -11,6 +11,34 @@ class ViguErrorHandler {
 	private static $_log = array();
 
 	/**
+	 * The site to send errors to.
+	 *
+	 * @var string
+	 */
+	private static $_site;
+
+	/**
+	 * Read and parse shutdown.ini.
+	 *
+	 * @return boolean True on success, false on failure.
+	 */
+	public static function readConfig() {
+		if (file_exists($iniFile = dirname(__FILE__) . '/shutdown.ini')) {
+			$config = parse_ini_file($iniFile);
+			if (isset($config['site'])) {
+				self::$_site = $config['site'];
+				return true;
+			} else {
+				trigger_error('Vigu shutdown handler could not determine the site, from shutdown.ini.', E_USER_NOTICE);
+				return false;
+			}
+		} else {
+			trigger_error('Vigu shutdown handler could not locate shutdown.ini.', E_USER_NOTICE);
+			return false;
+		}
+	}
+
+	/**
 	 * Handle any fatal errors.
 	 *
 	 * @return void
@@ -169,7 +197,7 @@ class ViguErrorHandler {
 	 */
 	private static function _send() {
 		if (!empty(self::$_log)) {
-			$url = 'http://vigu.localhost/api';
+			$url = 'http://' . self::$_site . '/api';
 
 			$httpRequest = new HttpRequest($url, HttpRequest::METH_POST);
 			$httpRequest->addPostFields(array('lines' => self::$_log));
@@ -184,6 +212,10 @@ class ViguErrorHandler {
 	}
 }
 
-register_shutdown_function('ViguErrorHandler::shutdown');
-set_error_handler('ViguErrorHandler::error');
-set_exception_handler('ViguErrorHandler::exception');
+if (ViguErrorHandler::readConfig()) {
+	register_shutdown_function('ViguErrorHandler::shutdown');
+	set_error_handler('ViguErrorHandler::error');
+	set_exception_handler('ViguErrorHandler::exception');
+} else {
+	trigger_error('Vigu could not be configured. Data will not be gathered.', E_USER_WARNING);
+}
