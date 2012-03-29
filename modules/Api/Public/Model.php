@@ -14,7 +14,7 @@ class ApiPublicModel {
 	/**
 	 * Get the configuration for a given option.
 	 *
-	 * @param string $option
+	 * @param string $option Options
 	 *
 	 * @return string
 	 *

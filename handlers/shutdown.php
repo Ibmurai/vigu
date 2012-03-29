@@ -86,7 +86,7 @@ class ViguErrorHandler {
 	/**
 	 * Handle any uncaught exceptions.
 	 *
-	 * @param Exception $exception
+	 * @param Exception $exception Exception
 	 *
 	 * @return void
 	 */
@@ -106,7 +106,7 @@ class ViguErrorHandler {
 	/**
 	 * Convert an error number to a string.
 	 *
-	 * @param integer $errno
+	 * @param integer $errno Error number
 	 *
 	 * @return string
 	 */
@@ -161,6 +161,8 @@ class ViguErrorHandler {
 	 * @param integer $line       The line number.
 	 * @param array   $context    The error context (variables available).
 	 * @param array[] $stacktrace The stacktrace, as produced by debug_backtrace().
+	 * 
+	 * @return void
 	 */
 	private static function _logError($errno, $message, $file, $line, $context = array(), $stacktrace = array()) {
 		array_shift($stacktrace);

@@ -1,25 +1,31 @@
 <?php
 /**
+ * Awesome actions to provide data for the frontend.
+ * 
  * PHP version 5
  *
- * @author Jens Riisom Schultz <jers@fynskemedier.dk>
- * @author Johannes Skov Frandsen <jsf@fynskemedier.dk>
+ * @category TODO_DOCUMENT_ME
+ * @package  TODO_DOCUMENT_ME
+ * @author   Jens Riisom Schultz <jers@fynskemedier.dk>
+ * @author   Johannes Skov Frandsen <jsf@fynskemedier.dk>
  */
 
 /**
  * Awesome actions to provide data for the frontend.
  *
- * @author Jens Riisom Schultz <jers@fynskemedier.dk>
- * @author Johannes Skov Frandsen <jsf@fynskemedier.dk>
+ * @category TODO_DOCUMENT_ME
+ * @package  TODO_DOCUMENT_ME
+ * @author   Jens Riisom Schultz <jers@fynskemedier.dk>
+ * @author   Johannes Skov Frandsen <jsf@fynskemedier.dk>
  */
 class ApiPublicControllerLog extends ApiPublicController {
 	/**
 	 * Data for the frontend table.
 	 *
-	 * @param integer $rows  <10>        Number of rows to return
-	 * @param integer $page  <1>         Result offset
-	 * @param string  $sidx  <timestamp> Field to sort by, 'timestamp' or 'count'.
-	 * @param string  $path  <null>      Limit search to match a specific path (default is null = any file path)
+	 * @param integer $rows <10>        Number of rows to return
+	 * @param integer $page <1>         Result offset
+	 * @param string  $sidx <timestamp> Field to sort by, 'timestamp' or 'count'.
+	 * @param string  $path <null>      Limit search to match a specific path (default is null = any file path)
 	 *
 	 * @return void
 	 */
@@ -74,19 +80,22 @@ class ApiPublicControllerLog extends ApiPublicController {
 		try {
 			$line = new ApiPublicModelLine($key);
 
-			$this->assign('details', array(
-				'host'       => $line->getHost(),
-				'last'       => date('Y-m-d H:i:s', $timestampMax = $line->getLast()),
-				'first'      => date('Y-m-d H:i:s', $timestampMin = $line->getFirst()),
-				'level'      => $line->getLevel(),
-				'message'    => $line->getMessage(),
-				'file'       => $line->getFile(),
-				'line'       => $line->getLine(),
-				'context'    => $line->getContext(),
-				'stacktrace' => $line->getStacktrace(),
-				'count'      => $count = $line->getCount(),
-				'frequency'  => ($count / (max(1, $timestampMax - $timestampMin))) * 3600,
-			));
+			$this->assign(
+			    'details',
+				array(
+					'host'       => $line->getHost(),
+					'last'       => date('Y-m-d H:i:s', $timestampMax = $line->getLast()),
+					'first'      => date('Y-m-d H:i:s', $timestampMin = $line->getFirst()),
+					'level'      => $line->getLevel(),
+					'message'    => $line->getMessage(),
+					'file'       => $line->getFile(),
+					'line'       => $line->getLine(),
+					'context'    => $line->getContext(),
+					'stacktrace' => $line->getStacktrace(),
+					'count'      => $count = $line->getCount(),
+					'frequency'  => ($count / (max(1, $timestampMax - $timestampMin))) * 3600,
+				)
+			);
 		} catch (Exception $e) {
 			$this->assign('error', get_class($e) . ': ' . $e->getMessage());
 		}
