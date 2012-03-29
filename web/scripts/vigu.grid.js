@@ -68,16 +68,32 @@ Vigu.Grid = (function($) {
 					{
 						url : '/api/log/grid' + Vigu.Grid.queryString(),
 						datatype : "json",
-						colNames : [ 'Level', 'Message', 'Last', 'Count'],
+						colNames : [ 'Level', 'Host', 'Message', 'Last', 'Count'],
 						colModel : [ 
-						             {name : 'level',     index : 'level',     resizable : false, width : 120,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter}, 
+						             {name : 'level',     index : 'level',     resizable : false, sortable : false, width : 120,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter}, 
+						             {name : 'host',     index : 'host',     resizable : false, sortable : false, width : 120,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter}, 
 						             {name : 'message',   index : 'message',   classes : 'messageGrid', sortable : false}, 
 						             {name : 'timestamp', index : 'timestamp', resizable : false, width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter}, 
 						             {name : 'count',     index : 'count',     resizable : false, width : 60,  align: 'center', fixed : true, title : false}
 						           ],
+			            jsonReader : { 
+			        	      root: "rows", 
+			        	      page: "page", 
+			        	      total: "total", 
+			        	      records: "records", 
+			        	      repeatitems: true, 
+			        	      cell: "cell", 
+			        	      id: "key",
+			        	      userdata: "userdata",
+			        	      subgrid: { 
+			        	         root:"rows", 
+			        	         repeatitems: true, 
+			        	         cell:"cell" 
+			        	      } 
+			        	   },
 						loadtext: 'Loading...',
-						rowNum : 50,
-						rowList : [ 50, 100, 150 ],
+						rowNum : 100,
+						rowList : [100, 200, 300],
 						pager : '#pager',
 						sortname : 'timestamp',
 						viewrecords : true,
@@ -108,7 +124,7 @@ Vigu.Grid = (function($) {
 		 * Formats the level
 		 * 
 		 * @param {String} cellvalue The value to be formatted
-		 * @param {Object} options   Containing the row id adn column id
+		 * @param {Object} options   Containing the row id and column id
 		 * @param {Object} rowObject Is a row data represented in the format determined from datatype option
 		 * 
 		 * @return {String}
@@ -116,7 +132,10 @@ Vigu.Grid = (function($) {
 		 */
 		levelFormatter : function(cellvalue, options, rowObject) {
 			var lower = cellvalue.toLowerCase();
-			var className = 'errorlevel_'+ lower.replace(' error', '_error').replace(' warning', '_warning').replace(' notice', '_notice');
+			var className = 'errorlevel_'+ lower.replace(' error', '_error')
+												.replace(' warning', '_warning')
+												.replace(' notice', '_notice')
+												.replace(' deprecated', '_deprecated');
 			return '<span class="'+ className +'">' + lower.charAt(0).toUpperCase() + lower.slice(1) + '</span>';
 		},
 		/**

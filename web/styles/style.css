@@ -1,3 +1,5 @@
+@IMPORT url("errors.css");
+
 div[role=application] {
 	margin: 0px;
 	padding: 0px;
@@ -117,7 +119,7 @@ div.fields dt {
 	font-weight: bold;
 	float: left;
 	padding: 5px 0px 5px 0px;
-	width: 50px;
+	width: 100px;
 }
 
 div.fields dd {
@@ -128,20 +130,8 @@ div.fields dd {
 	overflow: hidden;
 }
 
-div.error {
-	background-image: url(/images/error.png);
-}
-
-div.warning {
-	background-image: url(/images/warning.png);
-}
-
-div.deprecated {
-	background-image: url(/images/deprecated.png);
-}
-
-div.notice {
-	background-image: url(/images/notice.png);
+div.fields dd.file_search {
+	cursor: pointer;
 }
 
 div[role=toolbar] {
@@ -157,70 +147,6 @@ div[role=toolbar] h1 {
 	font-size: 20px;
 }
 
-td[role=gridcell] span.errorlevel_parse {
-	color: MediumVioletRed;
-	font-weight: bold;
-}
-
-td[role=gridcell] span.errorlevel_compile_error {
-	color: FireBrick;
-	font-weight: bold;
-}
-
-td[role=gridcell] span.errorlevel_compile_warning {
-	color: Sienna;
-	font-weight: bold;
-}
-
-td[role=gridcell] span.errorlevel_core_error {
-	color: OrangeRed;
-	font-weight: bold;
-}
-
-td[role=gridcell] span.errorlevel_core_warning {
-	color: DarkGoldenRod;
-	font-weight: bold;
-}
-
-td[role=gridcell] span.errorlevel_recoverable_error {
-	color: Sienna;
-}
-
-td[role=gridcell] span.errorlevel_error {
-	color: red;
-}
-
-td[role=gridcell] span.errorlevel_user_error {
-	font-style: italic;
-	color: red;
-}
-
-td[role=gridcell] span.errorlevel_warning {
-	color: maroon;
-}
-
-td[role=gridcell] span.errorlevel_user_warning {
-	font-style: italic;
-	color: maroon;
-}
-
-td[role=gridcell] span.errorlevel_notice {
-	color: orange;
-}
-
-td[role=gridcell] span.errorlevel_user_notice {
-	font-style: italic;
-	color: orange;
-}
-
-td[role=gridcell] span.errorlevel_strict {
-	color: CornflowerBlue;
-}
-
-td[role=gridcell] span.errorlevel_deprecated {
-	color: RoyalBlue;
-}
-
 div[role=toolbar] input[type=text] {
 	margin: 0px;
 	padding: 2px;
@@ -228,15 +154,7 @@ div[role=toolbar] input[type=text] {
 	border: 1px solid #AAAAAA;
 	font-size: 16px;
 	height: 22px;
-}
-
-div[role=toolbar] select {
-	width: 150px;
-}
-
-div[role=toolbar] .ui-selectmenu {
-	float: right;
-	width: 100px;
+	width: 800px;
 }
 
 table[role=grid] {

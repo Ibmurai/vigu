@@ -14,15 +14,14 @@ Vigu.Document = (function($) {
 			 * 
 			 * @return {Object}
 			 */
-			render : function(node, id) {
+			render : function(node, key) {
 				$.ajax({
 					url : '/api/log/details',
 					dataType : 'json',
 					data : {
-						id : id
+						key : key
 					},
 					success : function(data) {
-						console.log(data);
 						$("[role=document]").remove();
 						var data = data['details'];
 						var document = $('<div>').attr('role', 'document').addClass('ui-widget ui-widget-content ui-corner-all');
@@ -42,23 +41,25 @@ Vigu.Document = (function($) {
 			 * @return undefined
 			 */
 			headerSection : function(node, data) {
+				console.log(data);
 				var title = data.level + ': ' + data.message;
+				var level = data.level.toLowerCase().replace(' error', '_error').replace(' warning', '_warning').replace(' notice', '_notice')
 				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text(title).attr('title', title)).appendTo(node);
 				left = $('<div>').addClass('icons').appendTo(node);
 				right = $('<div>').addClass('fields').appendTo(node);
-				$('<div>').addClass(data.level.toLowerCase()).addClass('errorLevel').appendTo(left);
+				$('<div>').addClass(level).addClass('errorLevel').appendTo(left);
 				$('<div>').addClass('count').text(data.count).appendTo(left);
 				dl = $('<dl>');
-				$('<dt>').text('First').appendTo(dl);
-				$('<dd>').text(data.first).attr('title', data.first).appendTo(dl); 
-				$('<dt>').text('Module').appendTo(dl);
-				if (data.module) {
-					$('<dd>').text(data.module).attr('title', data.module).appendTo(dl);
-				} else {
-					$('<dd>').text('<no module>').appendTo(dl);
-				}
+				$('<dt>').text('Last (First)').appendTo(dl);
+				$('<dd>').text(data.last + ' (' + data.first + ')').attr('title', data.last + '' + data.first + ')').appendTo(dl); 
+				$('<dt>').text('Frequency').appendTo(dl);
+				$('<dd>').text(data.frequency).attr('title', data.frequency).appendTo(dl);
 				$('<dt>').text('File').appendTo(dl);
-				$('<dd>').text(data.file).attr('title', data.file).appendTo(dl);
+				$('<dd>').text(data.file).addClass('file_search').attr('title', data.file).click(function(){
+				     Vigu.Grid.parameters.path = data.file;
+				     $('input[name="search"]').val(data.file);
+				     Vigu.Grid.reload();
+					}).appendTo(dl);
 				$('<dt>').text('Line').appendTo(dl);
 				$('<dd>').text(data.line).appendTo(dl);
 				dl.appendTo(right);

@@ -47,6 +47,7 @@ class ApiPublicControllerLog extends ApiPublicController {
 				'key'  => $line->getKey(),
 				'cell' => array(
 					$line->getLevel(),
+					$line->getHost(),
 					$line->getMessage(),
 					date('Y-m-d H:i:s', $line->getLast()),
 					$line->getCount(),
