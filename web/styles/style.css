@@ -29,21 +29,23 @@ div[role=region] {
 }
 
 .lineField {
-
+	
 }
 
 .classField {
-
+	
 }
 
 .pathField {
-
+	
 }
+
 .functionField {
-
+	
 }
+
 .functionName {
-		font-weight: bold;
+	font-weight: bold;
 	color: fuchsia;
 }
 
@@ -155,20 +157,68 @@ div[role=toolbar] h1 {
 	font-size: 20px;
 }
 
-td[role=gridcell] span.error {
+td[role=gridcell] span.errorlevel_parse {
+	color: MediumVioletRed;
+	font-weight: bold;
+}
+
+td[role=gridcell] span.errorlevel_compile_error {
+	color: FireBrick;
+	font-weight: bold;
+}
+
+td[role=gridcell] span.errorlevel_compile_warning {
+	color: Sienna;
+	font-weight: bold;
+}
+
+td[role=gridcell] span.errorlevel_core_error {
+	color: OrangeRed;
+	font-weight: bold;
+}
+
+td[role=gridcell] span.errorlevel_core_warning {
+	color: DarkGoldenRod;
+	font-weight: bold;
+}
+
+td[role=gridcell] span.errorlevel_recoverable_error {
+	color: Sienna;
+}
+
+td[role=gridcell] span.errorlevel_error {
 	color: red;
 }
 
-td[role=gridcell] span.warning {
+td[role=gridcell] span.errorlevel_user_error {
+	font-style: italic;
+	color: red;
+}
+
+td[role=gridcell] span.errorlevel_warning {
 	color: maroon;
 }
 
-td[role=gridcell] span.notice {
+td[role=gridcell] span.errorlevel_user_warning {
+	font-style: italic;
+	color: maroon;
+}
+
+td[role=gridcell] span.errorlevel_notice {
 	color: orange;
 }
 
-td[role=gridcell] span.deprecated {
-	color: purple;
+td[role=gridcell] span.errorlevel_user_notice {
+	font-style: italic;
+	color: orange;
+}
+
+td[role=gridcell] span.errorlevel_strict {
+	color: CornflowerBlue;
+}
+
+td[role=gridcell] span.errorlevel_deprecated {
+	color: RoyalBlue;
 }
 
 div[role=toolbar] input[type=text] {

@@ -55,6 +55,7 @@ function _randomHost() {
 		'USER ERROR',
 		'USER WARNING',
 		'USER NOTICE',
+		'USER DEPRECATED',
 		'STRICT',
 		'RECOVERABLE ERROR',
 	);
@@ -101,7 +102,7 @@ function getLog($amount = 100) {
 	for ($i = 0; $i < $amount; $i++) {
 		$log[] = array(
 			'host'       => _randomHost(),
-			'timestamp'  => mktime(0,0,0,1,1,2012) + rand(0, 3600),
+			'timestamp'  => rand(strtotime('yesterday'), time()),
 			'level'      => _randomLevel(),
 			'message'    => _randomMessage(),
 			'file'       => _randomFile(),

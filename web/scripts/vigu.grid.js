@@ -70,16 +70,16 @@ Vigu.Grid = (function($) {
 						datatype : "json",
 						colNames : [ 'Level', 'Message', 'Last', 'Count'],
 						colModel : [ 
-						             {name : 'level',     index : 'level',     resizable : false, width : 80,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter}, 
-						             {name : 'message',   index : 'message',   classes : 'messageGrid'}, 
+						             {name : 'level',     index : 'level',     resizable : false, width : 120,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter}, 
+						             {name : 'message',   index : 'message',   classes : 'messageGrid', sortable : false}, 
 						             {name : 'timestamp', index : 'timestamp', resizable : false, width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter}, 
-						             {name : 'count',     index : 'count',     resizable : false, width : 50,  align: 'center', fixed : true, title : false}
+						             {name : 'count',     index : 'count',     resizable : false, width : 60,  align: 'center', fixed : true, title : false}
 						           ],
 						loadtext: 'Loading...',
 						rowNum : 50,
 						rowList : [ 50, 100, 150 ],
 						pager : '#pager',
-						sortname : 'level',
+						sortname : 'timestamp',
 						viewrecords : true,
 						sortorder : "desc",
 						autowidth: true,
@@ -92,6 +92,8 @@ Vigu.Grid = (function($) {
 						   Vigu.Document.render(Vigu.rightColumn, id);
 						},
 						gridComplete: function() {
+							$('.ui-grid-ico-sort.ui-icon-desc.ui-sort-ltr').hide();
+
 							var firstIdOnPage = $("[role='grid']").getDataIDs()[0];
 							Vigu.Document.render(Vigu.rightColumn, firstIdOnPage);
 						},
@@ -114,7 +116,8 @@ Vigu.Grid = (function($) {
 		 */
 		levelFormatter : function(cellvalue, options, rowObject) {
 			var lower = cellvalue.toLowerCase();
-			return '<span class="'+ lower +'">' + lower.charAt(0).toUpperCase() + lower.slice(1) + '</span>';
+			var className = 'errorlevel_'+ lower.replace(' error', '_error').replace(' warning', '_warning').replace(' notice', '_notice');
+			return '<span class="'+ className +'">' + lower.charAt(0).toUpperCase() + lower.slice(1) + '</span>';
 		},
 		/**
 		 * Formats the date
@@ -127,12 +130,13 @@ Vigu.Grid = (function($) {
 		 * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:custom_formatter
 		 */
 		agoFormatter : function(cellvalue, options, rowObject) {
-			var date = new Date((cellvalue || "").replace(/-/g,"/").replace(/[TZ]/g," ")),
+			var date = new Date((cellvalue || "").replace(/-/g,"/").replace(/[TZ]/g," "));
 			diff = (((new Date()).getTime() - date.getTime()) / 1000),
 			day_diff = Math.floor(diff / 86400);
-					
-			if ( isNaN(day_diff) || day_diff < 0 || day_diff >= 31 )
-				return;
+			
+			if (isNaN(day_diff) || day_diff < 0 || day_diff >= 31 ) {
+				return cellvalue;
+			}
 					
 			return day_diff == 0 && (
 					diff < 60 && "just now" ||

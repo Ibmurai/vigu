@@ -15,7 +15,7 @@ try {
 	}
 	$redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
 	$redis->select(0);
-	//$redis->flushAll();
+	$redis->flushAll();
 
 	$countRedis = new Redis();
 	if (!$countRedis->connect('localhost', 6379)) {
@@ -25,9 +25,9 @@ try {
 	}
 	$countRedis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
 	$countRedis->select(1);
-	//$countRedis->flushAll();
+	$countRedis->flushAll();
 
-	/*for ($i = 0; $i < 100; $i++) {
+	for ($i = 0; $i < 100; $i++) {
 		foreach (getLog(1000) as $line) {
 			$key = getKey($line);
 			if ($oldLine = $redis->hGetAll($key)) {
@@ -56,7 +56,7 @@ try {
 			}
 			updateCount($line, $key);
 		}
-	}*/
+	}
 
 	o('Top 10 by count:');
 	showTop10();
