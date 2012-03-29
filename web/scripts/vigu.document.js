@@ -74,7 +74,7 @@ Vigu.Document = (function($) {
 			stacktraceSection : function(node, stacktrace) {
 				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text('Stacktrace')).appendTo(node);
 				trace = $('<div>').addClass('stacktrace');
-				if (stacktrace.length != 0) {
+				if (stacktrace != undefined && stacktrace.length != 0) {
 					for (line in stacktrace) {
 						var path = stacktrace[line]['file'];
 						if (path != undefined) {
@@ -101,7 +101,7 @@ Vigu.Document = (function($) {
 			contextSection : function(node, context) {
 				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text('Context')).appendTo(node);
 				contextSection = $('<div>').addClass('context');
-				if (context.length != 0) {
+				if (context != undefined && context.length != 0) {
 					for (key in context) {
 						var varName = $('<span>').addClass('varName').text(key + ' : ').append($('<span>').addClass('varValue').text(context[key]));
 						$('<p>').append(varName).appendTo(contextSection);

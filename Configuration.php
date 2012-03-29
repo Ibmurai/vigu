@@ -27,5 +27,4 @@ class ViguConfiguration extends FroodConfiguration {
 	public function getBaseRoutes() {
 		return array_merge(array('' => array('site')), parent::getBaseRoutes());
 	}
-
 }
