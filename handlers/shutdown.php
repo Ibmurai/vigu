@@ -173,6 +173,7 @@ class ViguErrorHandler {
 			$httpRequest->addPostFields(array('lines' => self::$_log));
 
 			try {
+				$httpRequest->setOptions(array('timeout' => 1));
 				$httpRequest->send();
 			} catch (HttpException $e) {
 				// Ignore all errors

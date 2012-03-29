@@ -1,38 +1,29 @@
 <?php
 /**
- * TODO_DOCUMENT_ME
- *
  * PHP version 5
  *
- * @category TODO_DOCUMENT_ME
- * @package  TODO_DOCUMENT_ME
- * @author   Jens Riisom Schultz <jers@fynskemedier.dk>
- * @author   Johannes Skov Frandsen <jsf@fynskemedier.dk>
- * @since    2012-TODO-
+ * @author Jens Riisom Schultz <jers@fynskemedier.dk>
+ * @author Johannes Skov Frandsen <jsf@fynskemedier.dk>
  */
 require __DIR__ . '/../../../../handlers/shutdown.php';
 /**
- * TODO_DOCUMENT_ME
+ * Awesome actions to provide data for the frontend.
  *
- * @category   TODO_DOCUMENT_ME
- * @package    TODO_DOCUMENT_ME
- * @subpackage Class
- * @author     Jens Riisom Schultz <jers@fynskemedier.dk>
- * @author     Johannes Skov Frandsen <jsf@fynskemedier.dk>
+ * @author Jens Riisom Schultz <jers@fynskemedier.dk>
+ * @author Johannes Skov Frandsen <jsf@fynskemedier.dk>
  */
 class ApiPublicControllerLog extends ApiPublicController {
 	/**
-	 * Grid search.
+	 * Data for the frontend table.
 	 *
 	 * @param integer $rows  <10>        Number of rows to return
 	 * @param integer $page  <1>         Result offset
 	 * @param string  $sidx  <timestamp> Field to sort by, 'timestamp' or 'count'.
-	 * @param string  $level <null>      TODO?: Limit search to one error level (default is null = all levels)
 	 * @param string  $path  <null>      Limit search to match a specific path (default is null = any file path)
 	 *
 	 * @return void
 	 */
-	public function gridAction($rows, $page, $sidx, $level, $path) {
+	public function gridAction($rows, $page, $sidx, $path) {
 		$timeStart = microtime(true);
 		$offset = $rows * ($page - 1);
 		$limit  = $rows;
