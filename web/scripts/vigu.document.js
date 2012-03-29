@@ -41,7 +41,6 @@ Vigu.Document = (function($) {
 			 * @return undefined
 			 */
 			headerSection : function(node, data) {
-				console.log(data);
 				var title = data.level + ': ' + data.message;
 				var level = data.level.toLowerCase().replace(' error', '_error').replace(' warning', '_warning').replace(' notice', '_notice')
 				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text(title).attr('title', title)).appendTo(node);
