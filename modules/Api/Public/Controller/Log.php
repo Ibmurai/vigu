@@ -5,7 +5,7 @@
  * @author Jens Riisom Schultz <jers@fynskemedier.dk>
  * @author Johannes Skov Frandsen <jsf@fynskemedier.dk>
  */
-require __DIR__ . '/../../../../handlers/shutdown.php';
+
 /**
  * Awesome actions to provide data for the frontend.
  *
