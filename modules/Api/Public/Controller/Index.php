@@ -30,21 +30,7 @@ class ApiPublicControllerIndex extends ApiPublicController {
 		$this->doOutputDisabled();
 
 		foreach ($lines as $line) {
-			$logLine = new ApiPublicModelLogLine();
-			$logLine
-				->setTimestamp($line['timestamp'])
-				->setHost($line['host'])
-				->setLevel($line['level'])
-				->setMessage($line['message'])
-				->setFile($line['file'])
-				->setLine($line['line'])
-				->setContext(isset($line['context']) ? $line['context'] : array())
-				->setStacktrace(isset($line['stacktrace']) ? $line['stacktrace'] : array())
-			;
-			$this->_em->persist($logLine);
+			ApiPublicModelLine::create($line);
 		}
-
-		$this->_em->flush();
 	}
-
 }
