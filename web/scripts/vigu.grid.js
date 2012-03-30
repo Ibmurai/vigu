@@ -130,13 +130,16 @@ Vigu.Grid = (function($) {
 						height: gridHeight,
 						caption : "Errors",
 					    onSelectRow: function(id) {
-						   Vigu.Document.render(Vigu.rightColumn, id);
+					    	if (id != '') {
+					    		Vigu.Document.render(Vigu.rightColumn, id);
+					    	}
 						},
 						gridComplete: function() {
-							$('.ui-grid-ico-sort.ui-icon-desc.ui-sort-ltr').hide();
-
 							var firstIdOnPage = $("[role='grid']").getDataIDs()[0];
-							Vigu.Document.render(Vigu.rightColumn, firstIdOnPage);
+							$('.ui-grid-ico-sort.ui-icon-desc.ui-sort-ltr').hide();
+							if (firstIdOnPage != '') {
+								Vigu.Document.render(Vigu.rightColumn, firstIdOnPage);
+							}
 						},
 					});
 			

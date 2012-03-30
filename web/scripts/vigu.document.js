@@ -44,11 +44,11 @@ Vigu.Document = (function($) {
 				var title = data.level + ': ' + data.message;
 				var level = data.level.toLowerCase().replace(' error', '_error').replace(' warning', '_warning').replace(' notice', '_notice')
 				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text(title).attr('title', title)).appendTo(node);
-				left = $('<div>').addClass('icons').appendTo(node);
-				right = $('<div>').addClass('fields').appendTo(node);
+				var left = $('<div>').addClass('icons').appendTo(node);
+				var right = $('<div>').addClass('fields').appendTo(node);
 				$('<div>').addClass(level).addClass('errorLevel').appendTo(left);
 				$('<div>').addClass('count').text(data.count).appendTo(left);
-				dl = $('<dl>');
+				var dl = $('<dl>');
 				$('<dt>').text('Last (First)').appendTo(dl);
 				$('<dd>').text(data.last + ' (' + data.first + ')').attr('title', data.last + '' + data.first + ')').appendTo(dl); 
 				$('<dt>').text('Frequency').appendTo(dl);
@@ -73,17 +73,10 @@ Vigu.Document = (function($) {
 			 */
 			stacktraceSection : function(node, stacktrace) {
 				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text('Stacktrace')).appendTo(node);
-				trace = $('<div>').addClass('stacktrace');
+				var trace = $('<div>').addClass('stacktrace');
 				if (stacktrace != undefined && stacktrace.length != 0) {
 					for (line in stacktrace) {
-						var path = stacktrace[line]['file'];
-						if (path != undefined) {
-							var pathName = $('<span>').addClass('pathField').text('').append($('<span>').addClass('pathName').text(stacktrace[line]['file']));
-							var className = $('<span>').addClass('classField').text(' in ').append($('<span>').addClass('className').text(stacktrace[line]['class']));
-							var functionName = $('<span>').addClass('functionField').text('::').append($('<span>').addClass('functionName').text(stacktrace[line]['function'] + '()'));
-							var lineNumber = $('<span>').addClass('lineField').text(' on line ').append($('<span>').addClass('lineNumber').text(stacktrace[line]['line']));
-							$('<p>').addClass('trace').append(pathName).append(className).append(functionName).append(lineNumber).appendTo(trace);
-						}
+						this._stLine(trace, stacktrace[line]);
 					}
 				} else {
 					$('<p>').text('No stacktrace available').appendTo(trace);
@@ -100,7 +93,7 @@ Vigu.Document = (function($) {
 			 */
 			contextSection : function(node, context) {
 				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text('Context')).appendTo(node);
-				contextSection = $('<div>').addClass('context');
+				var contextSection = $('<div>').addClass('context');
 				if (context != undefined && context.length != 0) {
 					for (key in context) {
 						var varName = $('<span>').addClass('varName').text(key + ' : ').append($('<span>').addClass('varValue').text(context[key]));
@@ -110,6 +103,95 @@ Vigu.Document = (function($) {
 					$('<p>').text('No context available').appendTo(contextSection);
 				}
 				node.append(contextSection);
+			},
+			/**
+			 * Generate a stacktrace line
+			 * 
+			 * @param {jQuery} node Node
+			 * @param {String} line Line
+			 * 
+			 * @return undefined
+			 */
+			_stLine : function(node, line) {
+				var path = line['file'];
+				if (path != undefined) {
+					var p = $('<p>');
+					this._stPath(p, path);
+					this._stClass(p, line['class']);
+					this._stFunction(p, line['funtion'], line['type']);
+					this._stLineNumber(p, line['line']);
+					p.appendTo(node);
+				}
+			},
+			/**
+			 * Generate the linenumber element in a stacktrace line
+			 * 
+			 * @param {jQuery} node Node
+			 * @param {String} line Line number
+			 * 
+			 * @return undefined
+			 */
+			_stLineNumber : function(node, line) {
+				$('<span>')
+					.text(' on line ')
+					.append($('<span>')
+								.text(line)
+					)
+					.appendTo(node);
+			}, 
+			/**
+			 * Generate the function element in a stacktrace line
+			 * 
+			 * @param {jQuery} node         Node
+			 * @param {String} functionName Function name
+			 * @param {String} functionType Function type
+			 * 
+			 * @return undefined
+			 */
+			_stFunction : function(node, functionName, functionType) {
+				$('<span>')
+					.text(functionType)
+					.append($('<span>')
+								.text(functionName + '()')
+					)
+					.appendTo(node);
+			}, 
+			/**
+			 * Generate the class element in a stacktrace line
+			 * 
+			 * @param {jQuery} node      Node
+			 * @param {String} className Class name
+			 * 
+			 * @return undefined
+			 */
+			_stClass : function(node, className) {
+				$('<span>')
+					.text(' in ')
+					.append($('<span>')
+								.text(className)
+					)
+				.appendTo(node);
+			}, 
+			/**
+			 * Generate the path element in a stacktrace line
+			 * 
+			 * @param {jQuery} node Node
+			 * @param {String} path Path
+			 * 
+			 * @return undefined
+			 */
+			_stPath : function(node, path) {
+				$('<span>')
+					.click(function(){
+						Vigu.Grid.parameters.path = path;
+						$('input[name="search"]').val(path);
+						Vigu.Grid.reload();
+					})
+					.text('')
+					.append($('<span>')
+							.text(path)
+							)
+					.appendTo(node);
 			}
 		};
 })(jQuery);

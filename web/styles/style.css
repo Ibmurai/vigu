@@ -26,29 +26,26 @@ div[role=region] {
 	text-overflow: ellipsis;
 }
 
-.trace {
-	font-family: monospace;
+.stacktrace p span:nth-child(1) span {
+	font-weight: bold;
+	color: green;
+	cursor: pointer;
+}
+.stacktrace p span:nth-child(1) span:hover {
+	text-decoration: underline;
+}
+.stacktrace p span:nth-child(2) span {
+	font-weight: bold;
+	color: purple;
 }
 
-.lineField {
-	
-}
-
-.classField {
-	
-}
-
-.pathField {
-	
-}
-
-.functionField {
-	
-}
-
-.functionName {
+.stacktrace p span:nth-child(3) span {
 	font-weight: bold;
 	color: fuchsia;
+}
+.stacktrace p span:nth-child(4) span {
+	font-weight: bold;
+	color: blue;
 }
 
 .varName {
@@ -60,25 +57,11 @@ div[role=region] {
 	color: green;
 }
 
-.pathName {
-	font-weight: bold;
-	color: green;
-}
-
-.lineNumber {
-	font-weight: bold;
-	color: blue;
-}
-
-.className {
-	font-weight: bold;
-	color: purple;
-}
-
 .context,.stacktrace {
 	margin: 5px 2px 2px 5px;
 	padding: 4px 0px 3px 5px;
 	font-size: 12px;
+	font-family: monospace;
 }
 
 div[role=region] div[role=heading] table {
@@ -132,6 +115,9 @@ div.fields dd {
 
 div.fields dd.file_search {
 	cursor: pointer;
+}
+div.fields dd.file_search:hover {
+	text-decoration: underline;
 }
 
 div[role=toolbar] {
