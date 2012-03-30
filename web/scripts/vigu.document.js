@@ -150,9 +150,9 @@ Vigu.Document = (function($) {
 			 */
 			_stFunction : function(node, functionName, functionType) {
 				$('<span>')
-					.text(functionType)
+					.text('' + functionType)
 					.append($('<span>')
-								.text(functionName + '()')
+								.text('' + functionName + '()')
 					)
 					.appendTo(node);
 			}, 
