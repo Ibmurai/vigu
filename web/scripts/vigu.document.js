@@ -118,7 +118,7 @@ Vigu.Document = (function($) {
 					var p = $('<p>');
 					this._stPath(p, path);
 					this._stClass(p, line['class']);
-					this._stFunction(p, line['funtion'], line['type']);
+					this._stFunction(p, line['function'], line['type']);
 					this._stLineNumber(p, line['line']);
 					p.appendTo(node);
 				}
