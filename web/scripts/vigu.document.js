@@ -149,12 +149,19 @@ Vigu.Document = (function($) {
 			 * @return undefined
 			 */
 			_stFunction : function(node, functionName, functionType) {
-				$('<span>')
-					.text('' + functionType)
-					.append($('<span>')
-								.text('' + functionName + '()')
-					)
-					.appendTo(node);
+				if (functionName != undefined) {
+					$('<span>')
+						.text('' + functionType)
+						.append($('<span>')
+									.text('' + functionName + '()')
+						)
+						.appendTo(node);
+				} else {
+					$('<span>')
+						.append($('<span>')
+						)
+						.appendTo(node);
+				}
 			}, 
 			/**
 			 * Generate the class element in a stacktrace line
@@ -165,12 +172,19 @@ Vigu.Document = (function($) {
 			 * @return undefined
 			 */
 			_stClass : function(node, className) {
-				$('<span>')
-					.text(' in ')
-					.append($('<span>')
-								.text(className)
-					)
-				.appendTo(node);
+				if(className != undefined) {
+					$('<span>')
+						.text(' in ')
+						.append($('<span>')
+									.text(className)
+						)
+					.appendTo(node);
+				} else {
+					$('<span>')
+						.append($('<span>')
+						)
+					.appendTo(node);
+				}
 			}, 
 			/**
 			 * Generate the path element in a stacktrace line
