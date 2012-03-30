@@ -17,6 +17,18 @@ class ViguErrorHandler {
 	 */
 	private static $_site;
 
+	private static $_superGlobals = array(
+		'GLOBALS',
+		'_SERVER',
+		'_GET',
+		'_POST',
+		'_FILES',
+		'_COOKIE',
+		'_SESSION',
+		'_REQUEST',
+		'_ENV',
+	);
+
 	/**
 	 * Read and parse shutdown.ini.
 	 *
@@ -161,7 +173,7 @@ class ViguErrorHandler {
 	 * @param integer $line       The line number.
 	 * @param array   $context    The error context (variables available).
 	 * @param array[] $stacktrace The stacktrace, as produced by debug_backtrace().
-	 * 
+	 *
 	 * @return void
 	 */
 	private static function _logError($errno, $message, $file, $line, $context = array(), $stacktrace = array()) {
@@ -174,8 +186,8 @@ class ViguErrorHandler {
 			'message'    => $message,
 			'file'       => $file,
 			'line'       => $line,
-			'context'    => $context,
-			'stacktrace' => $stacktrace,
+			'context'    => self::_cleanContext($context),
+			'stacktrace' => self::_cleanStacktrace($stacktrace),
 		);
 	}
 
@@ -192,6 +204,46 @@ class ViguErrorHandler {
 		}
 	}
 
+	private static function _cleanStacktrace(&$stacktrace) {
+		foreach ($stacktrace as &$line) {
+			if (isset($line['object'])) {
+				unset($line['object']);
+			}
+			if (isset($line['args'])) foreach ($line['args'] as &$arg) {
+				switch (true) {
+					case is_object($arg):
+						$arg = 'instance of ' . get_class($arg);
+						break;
+					case is_array($arg):
+						$arg = 'array[' . count($arg) . ']';
+						break;
+				}
+			}
+		}
+
+		return $stacktrace;
+	}
+
+	private static function _cleanContext($context) {
+		$newContext = array();
+
+		foreach ($context as $key => $var) {
+			if (array_search($key, self::$_superGlobals) === false) {
+				switch (true) {
+					case is_object($var):
+						$var = 'instance of ' . get_class($var);
+						break;
+					case is_array($var):
+						$var = 'array[' . count($var) . ']';
+						break;
+				}
+				$newContext[$key] = $var;
+			}
+		}
+
+		return $newContext;
+	}
+
 	/**
 	 * Send the errors to the Vigu server.
 	 *
@@ -201,14 +253,21 @@ class ViguErrorHandler {
 		if (!empty(self::$_log)) {
 			$url = 'http://' . self::$_site . '/api';
 
-			$httpRequest = new HttpRequest($url, HttpRequest::METH_POST);
-			$httpRequest->addPostFields(array('lines' => self::$_log));
+			$timeStart = microtime(true);
+			foreach (array_chunk(self::$_log, 25) as $chunk) {
+				if (microtime(true) - $timeStart > 0.1) {
+					// This is likely 500+ errors posted
+					return;
+				}
+				$httpRequest = new HttpRequest($url, HttpRequest::METH_POST);
+				$httpRequest->addPostFields(array('lines' => $chunk));
 
-			try {
-				$httpRequest->setOptions(array('timeout' => 1));
-				$httpRequest->send();
-			} catch (HttpException $e) {
-				// Ignore all errors
+				try {
+					$httpRequest->setOptions(array('timeout' => 1));
+					$httpRequest->send();
+				} catch (HttpException $e) {
+					// Ignored
+				}
 			}
 		}
 	}
