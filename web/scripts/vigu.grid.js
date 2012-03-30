@@ -7,6 +7,18 @@ if (typeof Vigu === 'undefined') {
 Vigu.Grid = (function($) {
 	return {
 		/**
+		 * Should the grid autorefresh
+		 * 
+		 * @type {Boolean}
+		 */
+		autorefresh : false,
+		/**
+		 * Timer
+		 * 
+		 * @type {string}
+		 */
+		timer : '',
+		/**
 		 * Paramters used in query string
 		 * 
 		 * @type {String}
@@ -56,6 +68,19 @@ Vigu.Grid = (function($) {
 		 */
 		reload : function() {
 			$("#grid").jqGrid().setGridParam({url : '/api/log/grid' + Vigu.Grid.queryString()}).trigger("reloadGrid");
+		},
+		/**
+		 * Auto refresh grid
+		 * 
+		 * @return undefined
+		 */
+		autoRefresh : function() {
+			Vigu.Grid.autorefresh ? Vigu.Grid.autorefresh = false : Vigu.Grid.autorefresh = true;
+			if (Vigu.Grid.autorefresh) {
+				Vigu.Grid.timer = setInterval("Vigu.Grid.reload()", 5000);
+			} else {
+				clearInterval(Vigu.Grid.timer);
+			}
 		},
 		/**
 		 * Render the grid

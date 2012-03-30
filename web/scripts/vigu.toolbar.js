@@ -53,6 +53,26 @@ Vigu.Toolbar = (function($) {
 					 this.select();
 				})
 				.appendTo(node);
+			$('<button>')
+			.text('Reset')
+			.click(function(){
+				Vigu.Grid.parameters.path = '';
+				$('input[name="search"]').val('');
+				Vigu.Grid.reload();
+			}) 
+			.appendTo(node).button();
+			$('<button>')
+				.text('Reload')
+				.click(function(){
+					Vigu.Grid.reload();
+				}) 
+				.appendTo(node).button();
+			$('<button>')
+				.text('Auto Reload')
+				.click(function(){
+					Vigu.Grid.autoRefresh();
+				}) 
+				.appendTo(node).button();
 		}
 	};
 })(jQuery);

@@ -154,7 +154,10 @@ div[role=toolbar] input[type=text] {
 	border: 1px solid #AAAAAA;
 	font-size: 16px;
 	height: 22px;
-	width: 800px;
+	width: 49%;
+}
+div[role=toolbar] button {
+	float: right;
 }
 
 table[role=grid] {
