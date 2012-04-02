@@ -1,3 +1,6 @@
 ; The site that you want to push errors to.
 ; In this example errors will be pushed to a Vigu server/site at http://localhost/
 site = localhost
+
+; The folder to store vigu- log files temporarily - no trailing slash, please.
+dir = /tmp

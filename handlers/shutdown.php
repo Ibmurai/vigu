@@ -11,12 +11,17 @@ class ViguErrorHandler {
 	private static $_log = array();
 
 	/**
-	 * The site to send errors to.
+	 * The directory to store error logs in, temporarily.
 	 *
 	 * @var string
 	 */
-	private static $_site;
+	private static $_dir;
 
+	/**
+	 * These super globals get stripped from contexts before storing them.
+	 *
+	 * @var array
+	 */
 	private static $_superGlobals = array(
 		'GLOBALS',
 		'_SERVER',
@@ -37,13 +42,13 @@ class ViguErrorHandler {
 	public static function readConfig() {
 		if (file_exists($iniFile = dirname(__FILE__) . '/shutdown.ini')) {
 			$config = parse_ini_file($iniFile);
-			if (isset($config['site'])) {
-				self::$_site = $config['site'];
-				return true;
+			if (isset($config['dir'])) {
+				self::$_dir = $config['dir'];
 			} else {
-				trigger_error('Vigu shutdown handler could not determine the site, from shutdown.ini.', E_USER_NOTICE);
+				trigger_error('Vigu shutdown handler could not determine the directory to store temporary files, "dir", from shutdown.ini.', E_USER_NOTICE);
 				return false;
 			}
+			return true;
 		} else {
 			trigger_error('Vigu shutdown handler could not locate shutdown.ini.', E_USER_NOTICE);
 			return false;
@@ -204,6 +209,13 @@ class ViguErrorHandler {
 		}
 	}
 
+	/**
+	 * Clean a stacktrace, stripping class instances and array contents.
+	 *
+	 * @param array &$stacktrace
+	 *
+	 * @return array The cleaned stacktrace.
+	 */
 	private static function _cleanStacktrace(&$stacktrace) {
 		foreach ($stacktrace as &$line) {
 			if (isset($line['object'])) {
@@ -224,6 +236,13 @@ class ViguErrorHandler {
 		return $stacktrace;
 	}
 
+	/**
+	 * Clean a context array of superglobals, class instances and arrays.
+	 *
+	 * @param array $context
+	 *
+	 * @return array The cleaned context.
+	 */
 	private static function _cleanContext($context) {
 		$newContext = array();
 
@@ -245,17 +264,20 @@ class ViguErrorHandler {
 	}
 
 	/**
-	 * Send the errors to the Vigu server.
+	 * Store the errors in a file, to be consumed by the Vigu daemon.
 	 *
 	 * @return void
 	 */
 	private static function _send() {
+
+
 		if (!empty(self::$_log)) {
+			/*
 			$url = 'http://' . self::$_site . '/api';
 
 			$timeStart = microtime(true);
 			foreach (array_chunk(self::$_log, 25) as $chunk) {
-				if (microtime(true) - $timeStart > 0.1) {
+				if (false && microtime(true) - $timeStart > 0.1) {
 					// This is likely 500+ errors posted
 					return;
 				}
@@ -269,6 +291,12 @@ class ViguErrorHandler {
 					// Ignored
 				}
 			}
+			*/
+			$timeStart = microtime(true);
+
+			file_put_contents(tempnam(self::$_dir . '/', 'vigu-'), serialize(self::$_log), LOCK_EX);
+
+			trigger_error('Wrote ' . count(self::$_log) . ' errors in ' . sprintf('%.5f', microtime(true) - $timeStart) . ' seconds.', E_USER_NOTICE);
 		}
 	}
 }
