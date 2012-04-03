@@ -3,4 +3,8 @@
 site = localhost
 
 ; The folder to store vigu- log files temporarily - no trailing slash, please.
-dir = /tmp
+dir = /tmp/vigu
+
+; The vigu daemon log file.
+log = /tmp/vigu/vigu.log
+
