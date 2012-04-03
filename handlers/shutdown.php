@@ -95,7 +95,7 @@ class ViguErrorHandler {
 	 * @return boolean Returns false to continue error handling by other error handlers.
 	 */
 	public static function error($errno = 0, $errstr = '', $errfile = '', $errline = 0, $errcontext = null) {
-		self::_logError($errno, $errstr, $errfile, $errline, $errcontext, debug_backtrace());
+		self::_logError($errno, $errstr, $errfile, $errline, $errcontext, debug_backtrace(false));
 
 		return false;
 	}
@@ -194,6 +194,10 @@ class ViguErrorHandler {
 			'context'    => self::_cleanContext($context),
 			'stacktrace' => self::_cleanStacktrace($stacktrace),
 		);
+
+		if (count(self::$_log) > 100) {
+			self::_send();
+		}
 	}
 
 	/**
@@ -217,23 +221,38 @@ class ViguErrorHandler {
 	 * @return array The cleaned stacktrace.
 	 */
 	private static function _cleanStacktrace(&$stacktrace) {
+		$newStacktrace = array(
+			'function' => '',
+			'line' => 0,
+			'file' => '',
+			'class' => '',
+			'type' => '',
+		);
+
 		foreach ($stacktrace as &$line) {
-			if (isset($line['object'])) {
-				unset($line['object']);
-			}
-			if (isset($line['args'])) foreach ($line['args'] as &$arg) {
+			$newLine = array('args' => array());
+			if (isset($line['args'])) foreach ($line['args'] as $name => &$arg) {
 				switch (true) {
 					case is_object($arg):
-						$arg = 'instance of ' . get_class($arg);
+						$newLine['args'][$name] = 'instance of ' . get_class($arg);
 						break;
 					case is_array($arg):
-						$arg = 'array[' . count($arg) . ']';
+						$newLine['args'][$name] = 'array[' . count($arg) . ']';
+						break;
+					default:
+						$newLine['args'][$name] = $arg;
 						break;
 				}
 			}
+			if (isset($line['function'])) $newLine['function'] = $line['function'];
+			if (isset($line['line'])) $newLine['line'] = $line['line'];
+			if (isset($line['file'])) $newLine['file'] = $line['file'];
+			if (isset($line['class'])) $newLine['class'] = $line['class'];
+			if (isset($line['type'])) $newLine['type'] = $line['type'];
+			$newStacktrace[] = $newLine;
 		}
 
-		return $stacktrace;
+		return $newStacktrace;
 	}
 
 	/**
@@ -250,13 +269,15 @@ class ViguErrorHandler {
 			if (array_search($key, self::$_superGlobals) === false) {
 				switch (true) {
 					case is_object($var):
-						$var = 'instance of ' . get_class($var);
+						$newContext[$key] = 'instance of ' . get_class($var);
 						break;
 					case is_array($var):
-						$var = 'array[' . count($var) . ']';
+						$newContext[$key] = 'array[' . count($var) . ']';
+						break;
+					default:
+						$newContext[$key] = $var;
 						break;
 				}
-				$newContext[$key] = $var;
 			}
 		}
 
@@ -269,34 +290,13 @@ class ViguErrorHandler {
 	 * @return void
 	 */
 	private static function _send() {
-
-
 		if (!empty(self::$_log)) {
-			/*
-			$url = 'http://' . self::$_site . '/api';
+			$file = tempnam(self::$_dir . '/', 'vigu-');
 
-			$timeStart = microtime(true);
-			foreach (array_chunk(self::$_log, 25) as $chunk) {
-				if (false && microtime(true) - $timeStart > 0.1) {
-					// This is likely 500+ errors posted
-					return;
-				}
-				$httpRequest = new HttpRequest($url, HttpRequest::METH_POST);
-				$httpRequest->addPostFields(array('lines' => $chunk));
+			file_put_contents($file, serialize(self::$_log), LOCK_EX);
+			chmod($file, 0777);
 
-				try {
-					$httpRequest->setOptions(array('timeout' => 1));
-					$httpRequest->send();
-				} catch (HttpException $e) {
-					// Ignored
-				}
-			}
-			*/
-			$timeStart = microtime(true);
-
-			file_put_contents(tempnam(self::$_dir . '/', 'vigu-'), serialize(self::$_log), LOCK_EX);
-
-			trigger_error('Wrote ' . count(self::$_log) . ' errors in ' . sprintf('%.5f', microtime(true) - $timeStart) . ' seconds.', E_USER_NOTICE);
+			self::$_log = array();
 		}
 	}
 }
