@@ -8,6 +8,12 @@ require_once '../lib/PHP-Daemon/Core/Lock/File.php';
 require_once '../lib/PHP-Daemon/Core/Plugins/Ini.php';
 
 class ViguDaemon extends Core_Daemon {
+	/**
+	 * Maintains a count of the posting threads.
+	 *
+	 * @var integer
+	 */
+	private $_threads = 0;
 
 	/**
 	 * We keep the constructor as simple as possible because exceptions thrown from a
@@ -73,11 +79,26 @@ class ViguDaemon extends Core_Daemon {
 	 * @return void
 	 */
 	protected function execute() {
-		foreach (glob($this->Ini['dir'] . '/vigu-*') as $file) {
-			$this->log("Found file: $file");
-			$this->fork(array($this, 'postFileToServer'), array($file));
+		$files = glob($this->Ini['dir'] . '/vigu-*');
+
+		if (count($files) > 0) {
+			$newFiles = array();
+			foreach ($files as $file) {
+				if (@rename($file, $newFile = dirname($file) . '/proc-' . basename($file))) {
+					$newFiles[] = $newFile;
+				}
+			}
+			$this->fork(array($this, 'postFilesToServer'), array($newFiles));
 		}
 	}
+
+	protected function postFilesToServer($files) {
+		$this->log('Processing ' . count($files) . ' files...');
+		foreach ($files as $file) {
+			$this->postFileToServer($file);
+		}
+	}
+
 
 	/**
 	 * Post the contents of a given file to a Vigu server.
@@ -89,34 +110,32 @@ class ViguDaemon extends Core_Daemon {
 	protected function postFileToServer($file) {
 		$timeStart = microtime(true);
 
-		if (@rename($file, $newFile = dirname($file) . '/proc-' . basename($file))) {
-			$lines = @unserialize(file_get_contents($newFile));
+		$lines = @unserialize(file_get_contents($file));
 
-			if ($lines === false) {
-				$this->log("Could not unserialize $file.");
-			} else {
-				$url = 'http://' . $this->Ini['site'] . '/api';
-				$this->log("Posting lines from file, $file, to url, $url.");
+		if ($lines === false) {
+			$this->log("Could not unserialize $file.");
+		} else {
+			$url = 'http://' . $this->Ini['site'] . '/api';
+			$this->log("Posting lines from file, $file, to url, $url.");
 
-				foreach (array_chunk($lines, 25) as $chunk) {
-					$httpRequest = new HttpRequest($url, HttpRequest::METH_POST);
-					$httpRequest->addPostFields(array('lines' => $chunk));
+			foreach (array_chunk($lines, 25) as $chunk) {
+				$httpRequest = new HttpRequest($url, HttpRequest::METH_POST);
+				$httpRequest->addPostFields(array('lines' => $chunk));
 
-					try {
-						$httpRequest->setOptions(array('timeout' => 1));
-						$httpRequest->send();
-					} catch (HttpException $e) {
-						$this->log('Caught exception during posting - Some errors may have been lost: ' . get_class($e) . ': ' . $e->getMessage());
+				try {
+					$httpRequest->setOptions(array('timeout' => 1));
+					$httpRequest->send();
+				} catch (HttpException $e) {
+					$this->log('Caught exception during posting - Some errors may have been lost: ' . get_class($e) . ': ' . $e->getMessage());
 
-						unlink($newFile);
-						return;
-					}
+					unlink($file);
+					return;
 				}
-				$this->log('Posted ' . count($lines) . ' lines in ' . sprintf('%.3f', microtime(true) - $timeStart) . ' seconds.');
 			}
-
-			unlink($newFile);
+			$this->log('Posted ' . count($lines) . ' lines in ' . sprintf('%.3f', microtime(true) - $timeStart) . ' seconds.');
 		}
+
+		unlink($file);
 	}
 
 	/**
