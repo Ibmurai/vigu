@@ -144,27 +144,21 @@ class ViguDaemon extends Core_Daemon {
 		}
 
 		if ($oldLine = $this->_stoRedis->get($hash)) {
-			$changed = false;
-
 			if ($oldLine['last'] < $timestamp) {
 				$line['last'] = $timestamp;
 			}
 			if ($oldLine['first'] > $timestamp) {
 				$line['first'] = $timestamp;
-				$changed = true;
 			} else {
 				$line['first'] = $oldLine['first'];
 			}
 			if ($oldLine['last'] < $timestamp) {
 				$line['last'] = $timestamp;
-				$changed = true;
 			} else {
 				$line['last'] = $oldLine['last'];
 			}
 
-			if ($changed) {
-				$this->_stoRedis->set($hash, $line);
-			}
+			$this->_stoRedis->set($hash, $line);
 		} else {
 			$line['first'] = $timestamp;
 			$line['last'] = $timestamp;
@@ -178,10 +172,8 @@ class ViguDaemon extends Core_Daemon {
 
 		$this->_indRedis->multi();
 		if ($timestamp > $oldLastTimestamp) {
-			$this->log("$hash Updating $timestamp ($oldLastTimestamp).");
 			$this->_indRedis->zAdd(self::TIMESTAMPS_PREFIX, $timestamp, $hash);
 		} else {
-			$this->log("$hash Skipping $timestamp ($oldLastTimestamp).");
 			$timestamp = $oldLastTimestamp;
 		}
 		if ($line !== null) {
