@@ -1,6 +1,6 @@
 <?php
 /**
- * Operations on logged lines.
+ * Logged lines as a model.
  */
 class ApiPublicModelLine extends ApiPublicModel {
 	/**
@@ -88,7 +88,7 @@ class ApiPublicModelLine extends ApiPublicModel {
 	 * @throws RuntimeException If the key does not match a line.
 	 */
 	public function __construct($key) {
-		if (!($values = self::_getStorageRedis()->hGetAll($key)) || empty($values)) {
+		if (!($values = self::_getStorageRedis()->get($key)) || empty($values)) {
 			throw new RuntimeException("No line with key, $key, found.");
 		}
 
@@ -103,7 +103,7 @@ class ApiPublicModelLine extends ApiPublicModel {
 	 * @return integer
 	 */
 	public function getKey() {
-		return self::_getKey($this->_file, $this->_line, $this->_host, $this->_level);
+		return md5($this->_level . $this->_host . $this->_file . $this->_line . $this->_message);
 	}
 
 	/**
@@ -203,54 +203,6 @@ class ApiPublicModelLine extends ApiPublicModel {
 	}
 
 	/**
-	 * Create a new Line.
-	 *
-	 * @param array $line A hashed array on the format:
-	 *                    'host'       => string,
-	 *                    'timestamp'  => integer,
-	 *                    'level'      => string,
-	 *                    'message'    => string,
-	 *                    'file'       => string,
-	 *                    'line'       => integer,
-	 *                    'context'    => array,
-	 *                    'stacktrace' => array
-	 *
-	 * @return null
-	 */
-	public static function create($line) {
-		$key = self::_getKey($line['file'], $line['line'], $line['host'], $line['level']);
-
-		$redis = self::_getStorageRedis();
-
-		if ($oldLine = $redis->hGetAll($key)) {
-			$changed = false;
-			if ($oldLine['first'] > $line['timestamp']) {
-				$line['first'] = $line['timestamp'];
-				$changed = true;
-			} else {
-				$line['first'] = $oldLine['first'];
-			}
-			if ($oldLine['last'] < $line['timestamp']) {
-				$line['last'] = $line['timestamp'];
-				$changed = true;
-			} else {
-				$line['last'] = $oldLine['last'];
-			}
-			if ($changed) {
-				unset($line['timestamp']);
-				$redis->hMset($key, $line);
-			}
-		} else {
-			$line['first'] = $line['timestamp'];
-			$line['last'] = $line['timestamp'];
-			unset($line['timestamp']);
-			$redis->hMset($key, $line);
-		}
-
-		self::_index($line, $key);
-	}
-
-	/**
 	 * Get lines ordered by their last timestamp, descending.
 	 *
 	 * @param integer $offset
@@ -339,35 +291,6 @@ class ApiPublicModelLine extends ApiPublicModel {
 	}
 
 	/**
-	 * Index a newly created line.
-	 *
-	 * @param array $line A hashed array on the format:
-	 *                    'host'       => string,
-	 *                    'first'      => integer,
-	 *                    'last'       => integer,
-	 *                    'level'      => string,
-	 *                    'message'    => string,
-	 *                    'file'       => string,
-	 *                    'line'       => integer,
-	 *                    'context'    => array,
-	 *                    'stacktrace' => array
-	 *
-	 * @return null
-	 */
-	private static function _index($line, $key) {
-		$redis = self::_getIndexingRedis();
-
-		$count = $redis->zIncrBy(self::COUNTS_PREFIX, 1, $key);
-		if ($line['last'] > $redis->zScore(self::TIMESTAMPS_PREFIX, $key)) {
-			$redis->zAdd(self::TIMESTAMPS_PREFIX, $line['last'], $key);
-		}
-		foreach (self::_splitPath($line['file']) as $word) {
-			$redis->zAdd(self::TIMESTAMPS_PREFIX . strtolower($word), $line['last'], $key);
-			$redis->zAdd(self::COUNTS_PREFIX . strtolower($word), $count, $key);
-		}
-	}
-
-	/**
 	 * Get the Redis client used for storage.
 	 *
 	 * @return Redis
@@ -416,10 +339,6 @@ class ApiPublicModelLine extends ApiPublicModel {
 		$redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
 
 		return $redis;
-	}
-
-	private static function _getKey($file, $line, $host, $level) {
-		return "$file|$line|$host|$level";
 	}
 
 	/**

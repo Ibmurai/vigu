@@ -1,7 +1,7 @@
 <?php
 /**
  * Awesome actions to provide data for the frontend.
- * 
+ *
  * PHP version 5
  *
  * @category TODO_DOCUMENT_ME
@@ -93,7 +93,7 @@ class ApiPublicControllerLog extends ApiPublicController {
 					'context'    => $line->getContext(),
 					'stacktrace' => $line->getStacktrace(),
 					'count'      => $count = $line->getCount(),
-					'frequency'  => ($count / (max(1, $timestampMax - $timestampMin))) * 3600,
+					'frequency'  => ($count / (max(1, time() - $timestampMin))) * 3600,
 				)
 			);
 		} catch (Exception $e) {

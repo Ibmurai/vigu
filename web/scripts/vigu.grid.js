@@ -8,19 +8,19 @@ Vigu.Grid = (function($) {
 	return {
 		/**
 		 * Should the grid autorefresh
-		 * 
+		 *
 		 * @type {Boolean}
 		 */
 		autorefresh : false,
 		/**
 		 * Timer
-		 * 
+		 *
 		 * @type {string}
 		 */
 		timer : '',
 		/**
 		 * Paramters used in query string
-		 * 
+		 *
 		 * @type {String}
 		 */
 		parameters : {
@@ -52,9 +52,9 @@ Vigu.Grid = (function($) {
 		},
 		/**
 		 * Setup the tags for the grid
-		 * 
+		 *
 		 * @param {jQuery} Dom node
-		 * 
+		 *
 		 * @return undefined
 		 */
 		setup : function(node) {
@@ -63,7 +63,7 @@ Vigu.Grid = (function($) {
 		},
 		/**
 		 * reload the grid with updated query
-		 * 
+		 *
 		 * @return undefined
 		 */
 		reload : function() {
@@ -71,7 +71,7 @@ Vigu.Grid = (function($) {
 		},
 		/**
 		 * Auto refresh grid
-		 * 
+		 *
 		 * @return undefined
 		 */
 		autoRefresh : function() {
@@ -84,7 +84,7 @@ Vigu.Grid = (function($) {
 		},
 		/**
 		 * Render the grid
-		 * 
+		 *
 		 * @return undefined
 		 */
 		render : function() {
@@ -94,27 +94,27 @@ Vigu.Grid = (function($) {
 						url : '/api/log/grid' + Vigu.Grid.queryString(),
 						datatype : "json",
 						colNames : [ 'Level', 'Host', 'Message', 'Last', 'Count'],
-						colModel : [ 
-						             {name : 'level',     index : 'level',     resizable : false, sortable : false, width : 120,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter}, 
-						             {name : 'host',     index : 'host',     resizable : false, sortable : false, width : 120,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter}, 
-						             {name : 'message',   index : 'message',   classes : 'messageGrid', sortable : false}, 
-						             {name : 'timestamp', index : 'timestamp', resizable : false, width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter}, 
+						colModel : [
+						             {name : 'level',     index : 'level',     resizable : false, sortable : false, width : 120,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter},
+						             {name : 'host',     index : 'host',     resizable : false, sortable : false, width : 120,  align: 'center', fixed : true, title : false},
+						             {name : 'message',   index : 'message',   classes : 'messageGrid', sortable : false},
+						             {name : 'timestamp', index : 'timestamp', resizable : false, width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter},
 						             {name : 'count',     index : 'count',     resizable : false, width : 60,  align: 'center', fixed : true, title : false}
 						           ],
-			            jsonReader : { 
-			        	      root: "rows", 
-			        	      page: "page", 
-			        	      total: "total", 
-			        	      records: "records", 
-			        	      repeatitems: true, 
-			        	      cell: "cell", 
+			            jsonReader : {
+			        	      root: "rows",
+			        	      page: "page",
+			        	      total: "total",
+			        	      records: "records",
+			        	      repeatitems: true,
+			        	      cell: "cell",
 			        	      id: "key",
 			        	      userdata: "userdata",
-			        	      subgrid: { 
-			        	         root:"rows", 
-			        	         repeatitems: true, 
-			        	         cell:"cell" 
-			        	      } 
+			        	      subgrid: {
+			        	         root:"rows",
+			        	         repeatitems: true,
+			        	         cell:"cell"
+			        	      }
 			        	   },
 						loadtext: 'Loading...',
 						rowNum : 100,
@@ -124,7 +124,7 @@ Vigu.Grid = (function($) {
 						viewrecords : true,
 						sortorder : "desc",
 						autowidth: true,
-						viewrecords: true, 
+						viewrecords: true,
 						gridview: true,
 						hidegrid: false,
 						height: gridHeight,
@@ -142,7 +142,7 @@ Vigu.Grid = (function($) {
 							}
 						},
 					});
-			
+
 			$(window).bind('resize', function() {
 				$("#grid").setGridWidth(($("[role='application']").width() - 2) / 2, true);
 			}).trigger('resize');
@@ -150,11 +150,11 @@ Vigu.Grid = (function($) {
 		},
 		/**
 		 * Formats the level
-		 * 
+		 *
 		 * @param {String} cellvalue The value to be formatted
 		 * @param {Object} options   Containing the row id and column id
 		 * @param {Object} rowObject Is a row data represented in the format determined from datatype option
-		 * 
+		 *
 		 * @return {String}
 		 * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:custom_formatter
 		 */
@@ -168,11 +168,11 @@ Vigu.Grid = (function($) {
 		},
 		/**
 		 * Formats the date
-		 * 
+		 *
 		 * @param {String} cellvalue The value to be formatted
 		 * @param {Object} options   Containing the row id adn column id
 		 * @param {Object} rowObject Is a row data represented in the format determined from datatype option
-		 * 
+		 *
 		 * @return {String}
 		 * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:custom_formatter
 		 */
@@ -180,11 +180,11 @@ Vigu.Grid = (function($) {
 			var date = new Date((cellvalue || "").replace(/-/g,"/").replace(/[TZ]/g," "));
 			diff = (((new Date()).getTime() - date.getTime()) / 1000),
 			day_diff = Math.floor(diff / 86400);
-			
+
 			if (isNaN(day_diff) || day_diff < 0 || day_diff >= 31 ) {
 				return cellvalue;
 			}
-					
+
 			return day_diff == 0 && (
 					diff < 60 && "just now" ||
 					diff < 120 && "1 minute ago" ||
@@ -197,7 +197,7 @@ Vigu.Grid = (function($) {
 		},
 		/**
 		 * Construct the query string
-		 * 
+		 *
 		 * @return {String}
 		 */
 		queryString : function() {
@@ -207,7 +207,7 @@ Vigu.Grid = (function($) {
 					params.push(key + '=' + value);
 				}
 			});
-			
+
 			return (params.length > 0 ? '?' : '') + params.join('&');
 		}
 	};

@@ -9,22 +9,45 @@ require_once '../lib/PHP-Daemon/Core/Plugins/Ini.php';
 
 class ViguDaemon extends Core_Daemon {
 	/**
-	 * Maintains a count of the posting threads.
-	 *
-	 * @var integer
+	 * @var string
 	 */
-	private $_threads = 0;
+	const COUNTS_PREFIX = '|counts|';
 
 	/**
-	 * We keep the constructor as simple as possible because exceptions thrown from a
-	 * constructor are a PITA and difficult to recover from.
+	 * @var string
+	 */
+	const TIMESTAMPS_PREFIX = '|timestamps|';
+
+	/**
+	 * @var string
+	 */
+	const SEARCH_PREFIX = '|search|';
+
+	/**
+	 * The Redis connection for incoming data.
 	 *
-	 * Use the constructor only to set runtime settings, anything else you need to prepare your
-	 * daemon should should go in the setup() method.
+	 * @var Redis
+	 */
+	private $_incRedis;
+
+	/**
+	 * The Redis connection for storage.
 	 *
-	 * Any Plugins should be loaded in the setup() method.
+	 * @var Redis
+	 */
+	private $_stoRedis;
+
+	/**
+	 * The Redis connection for indexing.
 	 *
-	 * IMPORTANT to remember to always invoke the parent constructor.
+	 * @var Redis
+	 */
+	private $_indRedis;
+
+	/**
+	 * Construct a new Daemon instance.
+	 *
+	 * @return null
 	 */
 	protected function __construct() {
 		// We want to our daemon to tick once every 1 second.
@@ -39,10 +62,15 @@ class ViguDaemon extends Core_Daemon {
 		parent::__construct();
 	}
 
+	/**
+	 * Load plugins.
+	 *
+	 * @return null
+	 */
 	protected function load_plugins() {
 		// Use the INI plugin to provide an easy way to include config settings
 		$this->load_plugin('Ini');
-		$this->Ini->filename = 'shutdown.ini';
+		$this->Ini->filename = 'vigu.ini';
 	}
 
 	/**
@@ -52,14 +80,27 @@ class ViguDaemon extends Core_Daemon {
 	 * @throws Exception
 	 */
 	protected function setup() {
+		if (isset($this->Ini['redis'])) {
+			$this->_incRedis = new Redis();
+			$this->_incRedis->connect($this->Ini['redis']['host'], $this->Ini['redis']['port'], $this->Ini['redis']['timeout']);
+			$this->_incRedis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
+			$this->_incRedis->select(2);
+
+			$this->_stoRedis = new Redis();
+			$this->_stoRedis->connect($this->Ini['redis']['host'], $this->Ini['redis']['port'], $this->Ini['redis']['timeout']);
+			$this->_stoRedis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
+			$this->_stoRedis->select(0);
+
+			$this->_indRedis = new Redis();
+			$this->_indRedis->connect($this->Ini['redis']['host'], $this->Ini['redis']['port'], $this->Ini['redis']['timeout']);
+			$this->_indRedis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
+			$this->_indRedis->select(1);
+		} else {
+			$this->fatal_error('The configuration does not define a redis section.');
+		}
+
 		if (!isset($this->Ini['log'])) {
 			$this->fatal_error('shutdown.ini does not define the \'log\' setting.');
-		}
-		if (!isset($this->Ini['site'])) {
-			$this->fatal_error('shutdown.ini does not define the \'site\' setting.');
-		}
-		if (!isset($this->Ini['dir'])) {
-			$this->fatal_error('shutdown.ini does not define the \'dir\' setting.');
 		}
 		if ($this->is_parent) {
 			$emails = array();
@@ -79,63 +120,83 @@ class ViguDaemon extends Core_Daemon {
 	 * @return void
 	 */
 	protected function execute() {
-		$files = glob($this->Ini['dir'] . '/vigu-*');
+		$this->log($this->_incRedis->lSize('incoming') . ' elements in queue.');
+		$count = 0;
+		while (($inc = $this->_incRedis->lPop('incoming')) && $count++ < 1000) {
+			list($hash, $timestamp) = $inc;
+			$this->_process($hash, $timestamp);
+			$this->_incRedis->del($hash);
+		}
+	}
 
-		if (count($files) > 0) {
-			$newFiles = array();
-			foreach ($files as $file) {
-				if (@rename($file, $newFile = dirname($file) . '/proc-' . basename($file))) {
-					$newFiles[] = $newFile;
-				}
+	protected function _process($hash, $timestamp) {
+		if (($line = $this->_incRedis->get($hash)) === false) {
+			$line = null;
+		}
+
+		$this->_store($hash, $timestamp, $line);
+		$this->_index($hash, $timestamp, $line);
+	}
+
+	protected function _store($hash, $timestamp, $line = null) {
+		if ($line === null) {
+			$line = $this->_stoRedis->get($hash);
+		}
+
+		if ($oldLine = $this->_stoRedis->get($hash)) {
+			$changed = false;
+
+			if ($oldLine['last'] < $timestamp) {
+				$line['last'] = $timestamp;
 			}
-			$this->fork(array($this, 'postFilesToServer'), array($newFiles));
+			if ($oldLine['first'] > $timestamp) {
+				$line['first'] = $timestamp;
+				$changed = true;
+			} else {
+				$line['first'] = $oldLine['first'];
+			}
+			if ($oldLine['last'] < $timestamp) {
+				$line['last'] = $timestamp;
+				$changed = true;
+			} else {
+				$line['last'] = $oldLine['last'];
+			}
+
+			if ($changed) {
+				$this->_stoRedis->set($hash, $line);
+			}
+		} else {
+			$line['first'] = $timestamp;
+			$line['last'] = $timestamp;
+			$this->_stoRedis->set($hash, $line);
 		}
 	}
 
-	protected function postFilesToServer($files) {
-		$this->log('Processing ' . count($files) . ' files...');
-		foreach ($files as $file) {
-			$this->postFileToServer($file);
+	protected function _index($hash, $timestamp, $line = null) {
+		$count = $this->_indRedis->zIncrBy(self::COUNTS_PREFIX, 1, $hash);
+		$oldLastTimestamp = $this->_indRedis->zScore(self::TIMESTAMPS_PREFIX, $hash);
+		if ($timestamp > $oldLastTimestamp) {
+			$this->_indRedis->zAdd(self::TIMESTAMPS_PREFIX, $timestamp, $hash);
+		} else {
+			$timestamp = $oldLastTimestamp;
+		}
+		if ($line !== null) {
+			foreach (self::_splitPath($line['file']) as $word) {
+				$this->_indRedis->zAdd(self::TIMESTAMPS_PREFIX . strtolower($word), $timestamp, $hash);
+				$this->_indRedis->zAdd(self::COUNTS_PREFIX . strtolower($word), $count, $hash);
+			}
 		}
 	}
-
 
 	/**
-	 * Post the contents of a given file to a Vigu server.
+	 * Split a path to an array of words.
 	 *
-	 * @param string $file
+	 * @param string $path
 	 *
-	 * @return void
+	 * @return array
 	 */
-	protected function postFileToServer($file) {
-		$timeStart = microtime(true);
-
-		$lines = @unserialize(file_get_contents($file));
-
-		if ($lines === false) {
-			$this->log("Could not unserialize $file.");
-		} else {
-			$url = 'http://' . $this->Ini['site'] . '/api';
-			$this->log("Posting lines from file, $file, to url, $url.");
-
-			foreach (array_chunk($lines, 25) as $chunk) {
-				$httpRequest = new HttpRequest($url, HttpRequest::METH_POST);
-				$httpRequest->addPostFields(array('lines' => $chunk));
-
-				try {
-					$httpRequest->setOptions(array('timeout' => 1));
-					$httpRequest->send();
-				} catch (HttpException $e) {
-					$this->log('Caught exception during posting - Some errors may have been lost: ' . get_class($e) . ': ' . $e->getMessage());
-
-					unlink($file);
-					return;
-				}
-			}
-			$this->log('Posted ' . count($lines) . ' lines in ' . sprintf('%.3f', microtime(true) - $timeStart) . ' seconds.');
-		}
-
-		unlink($file);
+	private static function _splitPath($path) {
+		return array_filter(preg_split('#[/\\\\\\\.: -]#', $path));
 	}
 
 	/**

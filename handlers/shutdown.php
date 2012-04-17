@@ -11,11 +11,11 @@ class ViguErrorHandler {
 	private static $_log = array();
 
 	/**
-	 * The directory to store error logs in, temporarily.
+	 * The host, port and timeout to use to connect to Redis.
 	 *
-	 * @var string
+	 * @var array
 	 */
-	private static $_dir;
+	private static $_redisConnectionData;
 
 	/**
 	 * These super globals get stripped from contexts before storing them.
@@ -35,22 +35,30 @@ class ViguErrorHandler {
 	);
 
 	/**
-	 * Read and parse shutdown.ini.
+	 * Caches the host name.
+	 *
+	 * @var string
+	 */
+	private static $_host;
+
+	/**
+	 * Read and parse vigu.ini.
 	 *
 	 * @return boolean True on success, false on failure.
 	 */
 	public static function readConfig() {
-		if (file_exists($iniFile = dirname(__FILE__) . '/shutdown.ini')) {
-			$config = parse_ini_file($iniFile);
-			if (isset($config['dir'])) {
-				self::$_dir = $config['dir'];
+		if (file_exists($iniFile = dirname(__FILE__) . '/vigu.ini') || file_exists($iniFile = dirname(__FILE__) . '/../vigu.ini')) {
+			$config = parse_ini_file($iniFile, true);
+
+			if (isset($config['redis'])) {
+				self::$_redisConnectionData = $config['redis'];
 			} else {
-				trigger_error('Vigu shutdown handler could not determine the directory to store temporary files, "dir", from shutdown.ini.', E_USER_NOTICE);
+				trigger_error('Vigu shutdown handler could not determine the Redis connection data, from vigu.ini.', E_USER_NOTICE);
 				return false;
 			}
 			return true;
 		} else {
-			trigger_error('Vigu shutdown handler could not locate shutdown.ini.', E_USER_NOTICE);
+			trigger_error('Vigu shutdown handler could not locate vigu.ini.', E_USER_NOTICE);
 			return false;
 		}
 	}
@@ -64,7 +72,7 @@ class ViguErrorHandler {
 		$lastError = error_get_last();
 		$lastLoggedError = self::_getLastLoggedError();
 
-		if ($lastError) {
+		if ($lastError && !preg_match('/^Uncaught exception /', $lastError['message'])) {
 			// Make sure that the last error has not already been logged
 			if ($lastLoggedError) {
 				if ($lastLoggedError
@@ -109,8 +117,8 @@ class ViguErrorHandler {
 	 */
 	public static function exception(Exception $exception) {
 		self::_logError(
-			E_ERROR,
-			'Uncaught ' . get_class($exception) . ': ' . $exception->getMessage(),
+			preg_replace('/(?:([a-z])([A-Z][a-z]))/', '$1 $2', get_class($exception)),
+			$exception->getMessage(),
 			$exception->getFile(),
 			$exception->getLine(),
 			array(),
@@ -131,10 +139,10 @@ class ViguErrorHandler {
 		switch($errno) {
 			// Default
 			default:
-				return 'UNKNOWN';
+				return sprintf('UNKNOWN[%d/%b]', $errno, $errno);
 
 			// PHP 5.2+ error types
-			case E_ERROR :
+			case E_ERROR:
 				return 'ERROR';
 			case E_WARNING:
 				return 'WARNING';
@@ -146,9 +154,9 @@ class ViguErrorHandler {
 				return 'CORE ERROR';
 			case E_CORE_WARNING:
 				return 'CORE WARNING';
-			case E_CORE_ERROR:
+			case E_COMPILE_ERROR:
 				return 'COMPILE ERROR';
-			case E_CORE_WARNING:
+			case E_COMPILE_WARNING:
 				return 'COMPILE WARNING';
 			case E_USER_ERROR:
 				return 'USER ERROR';
@@ -172,12 +180,12 @@ class ViguErrorHandler {
 	/**
 	 * Log an error.
 	 *
-	 * @param integer $errno      The error number.
-	 * @param string  $message    The error message.
-	 * @param string  $file       The file.
-	 * @param integer $line       The line number.
-	 * @param array   $context    The error context (variables available).
-	 * @param array[] $stacktrace The stacktrace, as produced by debug_backtrace().
+	 * @param integer|string $errno      The error number.
+	 * @param string         $message    The error message.
+	 * @param string         $file       The file.
+	 * @param integer        $line       The line number.
+	 * @param array          $context    The error context (variables available).
+	 * @param array[]        $stacktrace The stacktrace, as produced by debug_backtrace().
 	 *
 	 * @return void
 	 */
@@ -185,9 +193,9 @@ class ViguErrorHandler {
 		array_shift($stacktrace);
 
 		self::$_log[] = array(
-			'host'       => isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'Unknown',
+			'host'       => self::_getHost(),
 			'timestamp'  => time(),
-			'level'      => self::_errnoToString($errno),
+			'level'      => is_string($errno) ? $errno : self::_errnoToString($errno),
 			'message'    => $message,
 			'file'       => $file,
 			'line'       => $line,
@@ -195,7 +203,7 @@ class ViguErrorHandler {
 			'stacktrace' => self::_cleanStacktrace($stacktrace),
 		);
 
-		if (count(self::$_log) > 100) {
+		if (count(self::$_log) >= 100) {
 			self::_send();
 		}
 	}
@@ -221,16 +229,17 @@ class ViguErrorHandler {
 	 * @return array The cleaned stacktrace.
 	 */
 	private static function _cleanStacktrace(&$stacktrace) {
-		$newStacktrace = array(
-			'function' => '',
-			'line' => 0,
-			'file' => '',
-			'class' => '',
-			'type' => '',
-		);
+		$newStacktrace = array();
 
 		foreach ($stacktrace as &$line) {
-			$newLine = array('args' => array());
+			$newLine = array(
+				'args' => array(),
+				'function' => '',
+				'line' => 0,
+				'file' => '',
+				'class' => '',
+				'type' => '',
+			);
 			if (isset($line['args'])) foreach ($line['args'] as $name => &$arg) {
 				switch (true) {
 					case is_object($arg):
@@ -285,19 +294,57 @@ class ViguErrorHandler {
 	}
 
 	/**
-	 * Store the errors in a file, to be consumed by the Vigu daemon.
+	 * Get the host name.
+	 *
+	 * @return string
+	 */
+	private static function _getHost() {
+		if (!isset(self::$_host)) {
+			if (isset($_SERVER['HTTP_HOST'])) {
+				self::$_host = $_SERVER['HTTP_HOST'];
+			} else if (function_exists('gethostname') && ($host = gethostname())) {
+				self::$_host = $host;
+			} else {
+				self::$_host = 'Unknown';
+			}
+		}
+
+		return self::$_host;
+	}
+
+	/**
+	 * Send the errors to Redis, to be consumed by the daemon.
+	 * Errors will be discarded if Redis is not reachable or the phpredis extension is not loaded.
 	 *
 	 * @return void
 	 */
 	private static function _send() {
 		if (!empty(self::$_log)) {
-			$file = tempnam(self::$_dir . '/', 'vigu-');
+			if (class_exists('Redis')) {
+				$redis = new Redis();
+				try {
+					if ($redis->connect('localhost')) {
+						$redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
+						$redis->select(2);
 
-			file_put_contents($file, serialize(self::$_log), LOCK_EX);
-			chmod($file, 0777);
+						$redis->multi(Redis::PIPELINE);
+						foreach (self::$_log as $line) {
+							$md5 = md5($line['level'] . $line['host'] . $line['file'] . $line['line'] . $line['message']);
+							$redis->rPush('incoming', array($md5, $line['timestamp']));
+							unset($line['timestamp']);
+							$redis->setnx($md5, $line);
+						}
+						$redis->exec();
+						$redis->close();
 
-			self::$_log = array();
+						self::$_log = array();
+					}
+				} catch (RedisException $ex) {
+					// Ignore
+				}
+			}
 		}
+
 	}
 }
 
