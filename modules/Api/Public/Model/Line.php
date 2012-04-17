@@ -301,7 +301,7 @@ class ApiPublicModelLine extends ApiPublicModel {
 	private static function _getStorageRedis() {
 		if (self::$_storageRedis == null) {
 			self::$_storageRedis = self::_getRedis();
-			self::$_storageRedis->select(0);
+			self::$_storageRedis->select(1);
 		}
 
 		return self::$_storageRedis;
@@ -317,7 +317,7 @@ class ApiPublicModelLine extends ApiPublicModel {
 	private static function _getIndexingRedis() {
 		if (self::$_indexingRedis == null) {
 			self::$_indexingRedis = self::_getRedis();
-			self::$_indexingRedis->select(1);
+			self::$_indexingRedis->select(2);
 		}
 
 		return self::$_indexingRedis;

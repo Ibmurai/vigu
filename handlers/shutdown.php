@@ -325,7 +325,7 @@ class ViguErrorHandler {
 				try {
 					if ($redis->connect('localhost')) {
 						$redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
-						$redis->select(2);
+						$redis->select(3);
 
 						$redis->multi(Redis::PIPELINE);
 						foreach (self::$_log as $line) {
@@ -336,13 +336,12 @@ class ViguErrorHandler {
 						}
 						$redis->exec();
 						$redis->close();
-
-						self::$_log = array();
 					}
 				} catch (RedisException $ex) {
 					// Ignore
 				}
 			}
+			self::$_log = array();
 		}
 
 	}

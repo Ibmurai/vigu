@@ -54,7 +54,7 @@ class ViguDaemon extends Core_Daemon {
 		$this->loop_interval = 1.00;
 
 		// Set our Lock Provider
-		$this->lock = new Core_Lock_File;
+		$this->lock = new Core_Lock_File();
 		$this->lock->daemon_name = __CLASS__;
 		$this->lock->ttl = $this->loop_interval;
 		$this->lock->path = dirname(__FILE__);
@@ -84,17 +84,17 @@ class ViguDaemon extends Core_Daemon {
 			$this->_incRedis = new Redis();
 			$this->_incRedis->connect($this->Ini['redis']['host'], $this->Ini['redis']['port'], $this->Ini['redis']['timeout']);
 			$this->_incRedis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
-			$this->_incRedis->select(2);
+			$this->_incRedis->select(3);
 
 			$this->_stoRedis = new Redis();
 			$this->_stoRedis->connect($this->Ini['redis']['host'], $this->Ini['redis']['port'], $this->Ini['redis']['timeout']);
 			$this->_stoRedis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
-			$this->_stoRedis->select(0);
+			$this->_stoRedis->select(1);
 
 			$this->_indRedis = new Redis();
 			$this->_indRedis->connect($this->Ini['redis']['host'], $this->Ini['redis']['port'], $this->Ini['redis']['timeout']);
 			$this->_indRedis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
-			$this->_indRedis->select(1);
+			$this->_indRedis->select(2);
 		} else {
 			$this->fatal_error('The configuration does not define a redis section.');
 		}
@@ -175,9 +175,13 @@ class ViguDaemon extends Core_Daemon {
 	protected function _index($hash, $timestamp, $line = null) {
 		$count = $this->_indRedis->zIncrBy(self::COUNTS_PREFIX, 1, $hash);
 		$oldLastTimestamp = $this->_indRedis->zScore(self::TIMESTAMPS_PREFIX, $hash);
+
+		$this->_indRedis->multi();
 		if ($timestamp > $oldLastTimestamp) {
+			$this->log("$hash Updating $timestamp ($oldLastTimestamp).");
 			$this->_indRedis->zAdd(self::TIMESTAMPS_PREFIX, $timestamp, $hash);
 		} else {
+			$this->log("$hash Skipping $timestamp ($oldLastTimestamp).");
 			$timestamp = $oldLastTimestamp;
 		}
 		if ($line !== null) {
@@ -186,6 +190,7 @@ class ViguDaemon extends Core_Daemon {
 				$this->_indRedis->zAdd(self::COUNTS_PREFIX . strtolower($word), $count, $hash);
 			}
 		}
+		$this->_indRedis->exec();
 	}
 
 	/**
