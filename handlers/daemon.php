@@ -149,7 +149,7 @@ class ViguDaemon extends Core_Daemon {
 			$this->_incRedis->del($hash);
 		}
 
-		if ($this->_upTime() - $lastCleanUpTime > $this->Ini['ttl']) {
+		if ($this->_upTime() - $lastCleanUpTime > 360) {
 			$this->_cleanIndexes();
 			$lastCleanUpTime = $this->_upTime();
 		}
@@ -201,11 +201,11 @@ class ViguDaemon extends Core_Daemon {
 				$line['last'] = $oldLine['last'];
 			}
 
-			$this->_stoRedis->setex($hash, $this->Ini['ttl'] + 60, $line);
+			$this->_stoRedis->setex($hash, $this->Ini['ttl'] + 360, $line);
 		} else {
 			$line['first'] = $timestamp;
 			$line['last'] = $timestamp;
-			$this->_stoRedis->setex($hash, $this->Ini['ttl'] + 60, $line);
+			$this->_stoRedis->setex($hash, $this->Ini['ttl'] + 360, $line);
 		}
 
 		return $line;
