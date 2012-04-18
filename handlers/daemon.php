@@ -64,7 +64,7 @@ class ViguDaemon extends Core_Daemon {
 		$this->lock = new Core_Lock_File();
 		$this->lock->daemon_name = __CLASS__;
 		$this->lock->ttl = $this->loop_interval;
-		$this->lock->path = dirname(__FILE__);
+		$this->lock->path = '/var/run';
 
 		parent::__construct();
 	}
@@ -239,12 +239,12 @@ class ViguDaemon extends Core_Daemon {
 	}
 
 	private function _cleanIndexes() {
-		return;
 		$timeStart = microtime(true);
 
 		$this->log('Cleaning indexes.');
 
-		$hashes = $this->_indRedis->zRange(self::TIMESTAMPS_PREFIX, 0, time() - $this->Ini['ttl']);
+		$hashes = $this->_indRedis->zRangeByScore(self::TIMESTAMPS_PREFIX, 0, time() - $this->Ini['ttl']);
+
 		$indexes = $this->_indRedis->keys('*');
 
 		$this->_indRedis->multi(Redis::PIPELINE);
