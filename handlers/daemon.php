@@ -239,6 +239,7 @@ class ViguDaemon extends Core_Daemon {
 	}
 
 	private function _cleanIndexes() {
+		return;
 		$timeStart = microtime(true);
 
 		$this->log('Cleaning indexes.');

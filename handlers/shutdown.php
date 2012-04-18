@@ -323,7 +323,7 @@ class ViguErrorHandler {
 			if (class_exists('Redis')) {
 				$redis = new Redis();
 				try {
-					if ($redis->connect('localhost')) {
+					if ($redis->connect(self::$_redisConnectionData['host'], self::$_redisConnectionData['port'], self::$_redisConnectionData['port'])) {
 						$redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
 						$redis->select(3);
 
