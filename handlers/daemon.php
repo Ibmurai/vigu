@@ -137,6 +137,8 @@ class ViguDaemon extends Core_Daemon {
 		/** @var float */
 		static $lastCleanUpTime = -999999999;
 
+		$this->_incRedis->select(3);
+
 		$incCount = $this->_incRedis->lSize('incoming');
 		if ($incCount > 0) {
 			$this->log("$incCount elements in queue.");
@@ -164,6 +166,8 @@ class ViguDaemon extends Core_Daemon {
 	 * @return null
 	 */
 	protected function _process($hash, $timestamp) {
+		$this->_incRedis->select(3);
+
 		if (($line = $this->_incRedis->get($hash)) === false) {
 			$line = null;
 		}
@@ -182,6 +186,8 @@ class ViguDaemon extends Core_Daemon {
 	 * @return array The stored error.
 	 */
 	protected function _store($hash, $timestamp, array $line = null) {
+		$this->_stoRedis->select(1);
+
 		if ($line === null) {
 			$line = $this->_stoRedis->get($hash);
 		}
@@ -221,6 +227,8 @@ class ViguDaemon extends Core_Daemon {
 	 * @return null
 	 */
 	protected function _index($hash, $timestamp, array $line) {
+		$this->_indRedis->select(2);
+
 		$count = $this->_indRedis->zIncrBy(self::COUNTS_PREFIX, 1, $hash);
 		$oldLastTimestamp = $this->_indRedis->zScore(self::TIMESTAMPS_PREFIX, $hash);
 
@@ -243,6 +251,7 @@ class ViguDaemon extends Core_Daemon {
 
 		$this->log('Cleaning indexes.');
 
+		$this->_indRedis->select(2);
 		$hashes = $this->_indRedis->zRangeByScore(self::TIMESTAMPS_PREFIX, 0, time() - $this->Ini['ttl']);
 
 		$indexes = $this->_indRedis->keys('*');
