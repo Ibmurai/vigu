@@ -45,6 +45,13 @@ class ViguDaemon extends Core_Daemon {
 	private $_indRedis;
 
 	/**
+	 * The time the daemon was started, in microtime.
+	 *
+	 * @var float
+	 */
+	private $_startTime;
+
+	/**
 	 * Construct a new Daemon instance.
 	 *
 	 * @return null
@@ -100,8 +107,13 @@ class ViguDaemon extends Core_Daemon {
 		}
 
 		if (!isset($this->Ini['log'])) {
-			$this->fatal_error('shutdown.ini does not define the \'log\' setting.');
+			$this->fatal_error('The configuration does not define the \'log\' setting.');
 		}
+
+		if (!isset($this->Ini['ttl'])) {
+			$this->fatal_error('The configuration does not define the \'ttl\' setting.');
+		}
+
 		if ($this->is_parent) {
 			$emails = array();
 			if (isset($this->Ini['emails'])) foreach ($this->Ini['emails'] as $email) {
@@ -110,6 +122,8 @@ class ViguDaemon extends Core_Daemon {
 			}
 			$this->email_distribution_list = $emails;
 		}
+
+		$this->_startTime = microtime(true);
 	}
 
 	/**
@@ -117,28 +131,57 @@ class ViguDaemon extends Core_Daemon {
 	 * This method is called at the frequency defined by loop_interval.
 	 * If this method takes longer than 90% of the loop_interval, a Warning will be raised.
 	 *
-	 * @return void
+	 * @return null
 	 */
 	protected function execute() {
-		$this->log($this->_incRedis->lSize('incoming') . ' elements in queue.');
+		/** @var float */
+		static $lastCleanUpTime = -999999999;
+
+		$incCount = $this->_incRedis->lSize('incoming');
+		if ($incCount > 0) {
+			$this->log("$incCount elements in queue.");
+		}
+
 		$count = 0;
 		while (($inc = $this->_incRedis->lPop('incoming')) && $count++ < 1000) {
 			list($hash, $timestamp) = $inc;
 			$this->_process($hash, $timestamp);
 			$this->_incRedis->del($hash);
 		}
+
+		if ($this->_upTime() - $lastCleanUpTime > $this->Ini['ttl']) {
+			$this->_cleanIndexes();
+			$lastCleanUpTime = $this->_upTime();
+		}
 	}
 
+	/**
+	 * Process an incoming error.
+	 *
+	 * @param string  $hash
+	 * @param integer $timestamp
+	 *
+	 * @return null
+	 */
 	protected function _process($hash, $timestamp) {
 		if (($line = $this->_incRedis->get($hash)) === false) {
 			$line = null;
 		}
 
-		$this->_store($hash, $timestamp, $line);
+		$line = $this->_store($hash, $timestamp, $line);
 		$this->_index($hash, $timestamp, $line);
 	}
 
-	protected function _store($hash, $timestamp, $line = null) {
+	/**
+	 * Store an incoming error.
+	 *
+	 * @param string     $hash
+	 * @param integer    $timestamp
+	 * @param array|null $line
+	 *
+	 * @return array The stored error.
+	 */
+	protected function _store($hash, $timestamp, array $line = null) {
 		if ($line === null) {
 			$line = $this->_stoRedis->get($hash);
 		}
@@ -158,31 +201,69 @@ class ViguDaemon extends Core_Daemon {
 				$line['last'] = $oldLine['last'];
 			}
 
-			$this->_stoRedis->set($hash, $line);
+			$this->_stoRedis->setex($hash, $this->Ini['ttl'] + 60, $line);
 		} else {
 			$line['first'] = $timestamp;
 			$line['last'] = $timestamp;
-			$this->_stoRedis->set($hash, $line);
+			$this->_stoRedis->setex($hash, $this->Ini['ttl'] + 60, $line);
 		}
+
+		return $line;
 	}
 
-	protected function _index($hash, $timestamp, $line = null) {
+	/**
+	 * Index an incoming error.
+	 *
+	 * @param string  $hash
+	 * @param integer $timestamp
+	 * @param array   $line
+	 *
+	 * @return null
+	 */
+	protected function _index($hash, $timestamp, array $line) {
 		$count = $this->_indRedis->zIncrBy(self::COUNTS_PREFIX, 1, $hash);
 		$oldLastTimestamp = $this->_indRedis->zScore(self::TIMESTAMPS_PREFIX, $hash);
 
-		$this->_indRedis->multi();
+		$this->_indRedis->multi(Redis::PIPELINE);
+
 		if ($timestamp > $oldLastTimestamp) {
 			$this->_indRedis->zAdd(self::TIMESTAMPS_PREFIX, $timestamp, $hash);
 		} else {
 			$timestamp = $oldLastTimestamp;
 		}
-		if ($line !== null) {
-			foreach (self::_splitPath($line['file']) as $word) {
-				$this->_indRedis->zAdd(self::TIMESTAMPS_PREFIX . strtolower($word), $timestamp, $hash);
-				$this->_indRedis->zAdd(self::COUNTS_PREFIX . strtolower($word), $count, $hash);
+		foreach (self::_splitPath($line['file']) as $word) {
+			$this->_indRedis->zAdd(self::TIMESTAMPS_PREFIX . strtolower($word), $timestamp, $hash);
+			$this->_indRedis->zAdd(self::COUNTS_PREFIX . strtolower($word), $count, $hash);
+		}
+		$this->_indRedis->exec();
+	}
+
+	private function _cleanIndexes() {
+		$timeStart = microtime(true);
+
+		$this->log('Cleaning indexes.');
+
+		$hashes = $this->_indRedis->zRange(self::TIMESTAMPS_PREFIX, 0, time() - $this->Ini['ttl']);
+		$indexes = $this->_indRedis->keys('*');
+
+		$this->_indRedis->multi(Redis::PIPELINE);
+		foreach ($hashes as $hash) {
+			foreach ($indexes as $index) {
+				$this->_indRedis->zRem($index, $hash);
 			}
 		}
 		$this->_indRedis->exec();
+
+		$this->log(count($hashes) . ' elements removed in ' . sprintf('%.3f seconds', microtime(true) - $timeStart));
+	}
+
+	/**
+	 * Get the Daemon uptime.
+	 *
+	 * @return float
+	 */
+	private function _upTime() {
+		return microtime(true) - $this->_startTime;
 	}
 
 	/**
