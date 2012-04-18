@@ -26,6 +26,7 @@ Vigu.Document = (function($) {
 						var data = data['details'];
 						var document = $('<div>').attr('role', 'document').addClass('ui-widget ui-widget-content ui-corner-all');
 						Vigu.Document.headerSection(document, data);
+						Vigu.Document.messageSection(document, data.message);
 						Vigu.Document.stacktraceSection(document, data.stacktrace);
 						Vigu.Document.contextSection(document, data.context);
 						document.appendTo(node);
@@ -41,8 +42,8 @@ Vigu.Document = (function($) {
 			 * @return undefined
 			 */
 			headerSection : function(node, data) {
-				var title = data.level + ': ' + data.message;
-				var level = data.level.toLowerCase().replace(' error', '_error').replace(' warning', '_warning').replace(' notice', '_notice')
+				var title = data.level;
+				var level = data.level.toLowerCase().replace(' error', '_error').replace(' warning', '_warning').replace(' notice', '_notice');
 				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text(title).attr('title', title)).appendTo(node);
 				var left = $('<div>').addClass('icons').appendTo(node);
 				var right = $('<div>').addClass('fields').appendTo(node);
@@ -62,6 +63,25 @@ Vigu.Document = (function($) {
 				$('<dt>').text('Line').appendTo(dl);
 				$('<dd>').text(data.line).appendTo(dl);
 				dl.appendTo(right);
+			},
+			/**
+			 * Generate the message block
+			 * 
+			 * @param {jQuery} node    Node
+			 * @param {Object} message Massage
+			 * 
+			 * @return undefined
+			 */
+			messageSection : function(node, message) {
+				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text('Message')).appendTo(node);
+				var messageText = $('<div>').addClass('message');
+				if (message != undefined) {
+					message = message.replace(/(href=\W?)/, 'target="ref" $1http://dk.php.net/manual/en/');
+					$('<p>').html(message).appendTo(messageText);
+				} else {
+					$('<p>').text('No stacktrace available').appendTo(messageText);
+				}
+				node.append(messageText);
 			},
 			/**
 			 * Generate the stacktrace block
@@ -116,9 +136,9 @@ Vigu.Document = (function($) {
 				var path = line['file'];
 				if (path != undefined) {
 					var p = $('<p>');
-					this._stPath(p, path);
 					this._stClass(p, line['class']);
 					this._stFunction(p, line['function'], line['type']);
+					this._stPath(p, path);
 					this._stLineNumber(p, line['line']);
 					p.appendTo(node);
 				}
@@ -132,12 +152,14 @@ Vigu.Document = (function($) {
 			 * @return undefined
 			 */
 			_stLineNumber : function(node, line) {
-				$('<span>')
+				if (line > 0) {
+					$('<span>')
 					.text(' on line ')
 					.append($('<span>')
-								.text(line)
+							.text(line)
 					)
 					.appendTo(node);
+				}
 			}, 
 			/**
 			 * Generate the function element in a stacktrace line
@@ -174,7 +196,7 @@ Vigu.Document = (function($) {
 			_stClass : function(node, className) {
 				if(className != undefined) {
 					$('<span>')
-						.text(' in ')
+						//.text(' in ')
 						.append($('<span>')
 									.text(className)
 						)
@@ -195,17 +217,19 @@ Vigu.Document = (function($) {
 			 * @return undefined
 			 */
 			_stPath : function(node, path) {
-				$('<span>')
+				if (path !== '') {
+					$('<span>')
 					.click(function(){
 						Vigu.Grid.parameters.path = path;
 						$('input[name="search"]').val(path);
 						Vigu.Grid.reload();
 					})
-					.text('')
+					.text(' in ')
 					.append($('<span>')
 							.text(path)
-							)
+					)
 					.appendTo(node);
+				}
 			}
 		};
 })(jQuery);

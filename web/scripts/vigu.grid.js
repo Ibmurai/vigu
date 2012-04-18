@@ -97,7 +97,7 @@ Vigu.Grid = (function($) {
 						colModel : [
 						             {name : 'level',     index : 'level',     resizable : false, sortable : false, width : 120,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter},
 						             {name : 'host',     index : 'host',     resizable : false, sortable : false, width : 120,  align: 'center', fixed : true, title : false},
-						             {name : 'message',   index : 'message',   classes : 'messageGrid', sortable : false},
+						             {name : 'message',   index : 'message',   classes : 'messageGrid', sortable : false, formatter : Vigu.Grid.messageFormatter},
 						             {name : 'timestamp', index : 'timestamp', resizable : false, width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter},
 						             {name : 'count',     index : 'count',     resizable : false, width : 60,  align: 'center', fixed : true, title : false}
 						           ],
@@ -140,13 +140,27 @@ Vigu.Grid = (function($) {
 							if (firstIdOnPage != '') {
 								Vigu.Document.render(Vigu.rightColumn, firstIdOnPage);
 							}
-						},
+						}
 					});
 
 			$(window).bind('resize', function() {
 				$("#grid").setGridWidth(($("[role='application']").width() - 2) / 2, true);
 			}).trigger('resize');
 
+		},
+		/**
+		 * Formats the message
+		 *
+		 * @param {String} cellvalue The value to be formatted
+		 * @param {Object} options   Containing the row id and column id
+		 * @param {Object} rowObject Is a row data represented in the format determined from datatype option
+		 *
+		 * @return {String}
+		 * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:custom_formatter
+		 */
+		messageFormatter : function(cellvalue, options, rowObject) {
+			var newValue = cellvalue.replace(/(href=\W?)/, 'target="ref" $1http://dk.php.net/manual/en/');
+			return newValue;
 		},
 		/**
 		 * Formats the level

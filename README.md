@@ -1,7 +1,7 @@
 Vigu
 ====
 
-*Authors* [Jens Riisom Schultz](mailto:ibber_of_crew42@hotmail.com), [Johannes Skov Frandsen](mailto:jsf@fynskemedier.dk)
+*Authors* [Jens Riisom Schultz](mailto:ibber_of_crew42@hotmail.com), [Johannes Skov Frandsen](mailto:localgod@heaven.dk)
 *Since*   2012-03-20
 
 Vigu is a PHP error aggregation system, which collects all possible PHP errors and aggregates them in a Redis database. It includes a frontend to browse the data.
@@ -38,7 +38,7 @@ Installing
 License
 -------
 
-Copyright 2012 Jens Riisom Schultz
+Copyright 2012 Jens Riisom Schultz, Johannes Skov Frandsen
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
