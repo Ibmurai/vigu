@@ -67,6 +67,7 @@ Vigu.Grid = (function($) {
 		 * @return undefined
 		 */
 		reload : function() {
+			$("#grid").jqGrid().setGridParam({page : 1});
 			$("#grid").jqGrid().setGridParam({url : '/api/log/grid' + Vigu.Grid.queryString()}).trigger("reloadGrid");
 		},
 		/**
@@ -192,7 +193,7 @@ Vigu.Grid = (function($) {
 		 */
 		agoFormatter : function(cellvalue, options, rowObject) {
 			var date = new Date((cellvalue || "").replace(/-/g,"/").replace(/[TZ]/g," "));
-			diff = (((new Date()).getTime() - date.getTime()) / 1000),
+			var diff = (((new Date()).getTime() - date.getTime()) / 1000),
 			day_diff = Math.floor(diff / 86400);
 
 			if (isNaN(day_diff) || day_diff < 0 || day_diff >= 31 ) {
@@ -215,7 +216,7 @@ Vigu.Grid = (function($) {
 		 * @return {String}
 		 */
 		queryString : function() {
-			params = [];
+			var params = [];
 			$.each(Vigu.Grid.parameters, function(key, value) {
 				if (value) {
 					params.push(key + '=' + value);
