@@ -97,7 +97,7 @@ Vigu.Grid = (function($) {
 						colNames : [ 'Level', 'Host', 'Message', 'Last', 'Count'],
 						colModel : [
 						             {name : 'level',     index : 'level',     resizable : false, sortable : false, width : 120,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter},
-						             {name : 'host',     index : 'host',     resizable : false, sortable : false, width : 120,  align: 'center', fixed : true, title : false},
+						             {name : 'host',      index : 'host',      resizable : false, sortable : false, width : 150,  align: 'center', fixed : true, title : false},
 						             {name : 'message',   index : 'message',   classes : 'messageGrid', sortable : false, formatter : Vigu.Grid.messageFormatter},
 						             {name : 'timestamp', index : 'timestamp', resizable : false, width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter},
 						             {name : 'count',     index : 'count',     resizable : false, width : 60,  align: 'center', fixed : true, title : false}
