@@ -28,18 +28,23 @@ class ApiPublicControllerLog extends ApiPublicController {
 		$offset = $rows * ($page - 1);
 		$limit  = $rows;
 
-		switch (true) {
-			case $sidx == 'timestamp':
-				$lines = ApiPublicModelLine::getMostRecent($offset, $limit, $path);
-				break;
-			case $sidx == 'count':
-				$lines = ApiPublicModelLine::getMostTriggered($offset, $limit, $path);
-				break;
-			default:
-				throw new RuntimeException("You cannot order by $sidx.");
-		}
+		try {
+			switch (true) {
+				case $sidx == 'timestamp':
+					$lines = ApiPublicModelLine::getMostRecent($offset, $limit, $path);
+					break;
+				case $sidx == 'count':
+					$lines = ApiPublicModelLine::getMostTriggered($offset, $limit, $path);
+					break;
+				default:
+					throw new RuntimeException("You cannot order by $sidx.");
+			}
 
-		$total = ApiPublicModelLine::getTotal($path);
+			$total = ApiPublicModelLine::getTotal($path);
+		} catch (RuntimeException $ex) {
+			$this->assign('error', $ex->getMessage());
+			return;
+		}
 
 		$rows = array();
 		foreach ($lines as $line) {
