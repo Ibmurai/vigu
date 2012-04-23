@@ -74,7 +74,7 @@ class ViguDaemon extends Core_Daemon {
 		$this->lock = new Core_Lock_File();
 		$this->lock->daemon_name = __CLASS__;
 		$this->lock->ttl = $this->loop_interval;
-		$this->lock->path = '/var/run';
+		$this->lock->path = '/var/run/';
 
 		parent::__construct();
 	}
