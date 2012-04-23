@@ -4,7 +4,7 @@
  * @link https://github.com/Ibmurai/vigu
  *
  * @copyright Copyright 2012 Jens Riisom Schultz, Johannes Skov Frandsen
- * @license   http://www.apache.org/licenses/LICENSE-2.0
+ * @license   http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
  */
 require_once '../lib/PHP-Daemon/Core/Daemon.php';
 require_once '../lib/PHP-Daemon/Core/PluginInterface.php';

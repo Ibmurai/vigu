@@ -4,13 +4,13 @@
  * @link https://github.com/Ibmurai/vigu
  *
  * @copyright Copyright 2012 Jens Riisom Schultz, Johannes Skov Frandsen
- * @license   http://www.apache.org/licenses/LICENSE-2.0
+ * @license   http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
  */
 /**
  * Actions to provide data for the frontend.
  *
  * @author Jens Riisom Schultz <ibber_of_crew42@hotmail.com>
- * @author Johannes Skov Frandsen <jsf@fynskemedier.dk>
+ * @author Johannes Skov Frandsen <localgod@heaven.dk>
  */
 class ApiPublicControllerLog extends ApiPublicController {
 	/**
