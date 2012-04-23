@@ -1,22 +1,16 @@
 <?php
 /**
- * Awesome actions to provide data for the frontend.
+ * This file is part of the Vigu PHP error aggregation system.
+ * @link https://github.com/Ibmurai/vigu
  *
- * PHP version 5
- *
- * @category TODO_DOCUMENT_ME
- * @package  TODO_DOCUMENT_ME
- * @author   Jens Riisom Schultz <jers@fynskemedier.dk>
- * @author   Johannes Skov Frandsen <jsf@fynskemedier.dk>
+ * @copyright Copyright 2012 Jens Riisom Schultz, Johannes Skov Frandsen
+ * @license   http://www.apache.org/licenses/LICENSE-2.0
  */
-
 /**
- * Awesome actions to provide data for the frontend.
+ * Actions to provide data for the frontend.
  *
- * @category TODO_DOCUMENT_ME
- * @package  TODO_DOCUMENT_ME
- * @author   Jens Riisom Schultz <jers@fynskemedier.dk>
- * @author   Johannes Skov Frandsen <jsf@fynskemedier.dk>
+ * @author Jens Riisom Schultz <ibber_of_crew42@hotmail.com>
+ * @author Johannes Skov Frandsen <jsf@fynskemedier.dk>
  */
 class ApiPublicControllerLog extends ApiPublicController {
 	/**

@@ -1,10 +1,10 @@
 #!/usr/bin/php
 <?php
 /**
- * This file is part of The Zaphod distribution.
- * @link https://github.com/Ibmurai/zaphod
+ * This file is part of the Vigu PHP error aggregation system.
+ * @link https://github.com/Ibmurai/vigu
  *
- * @copyright Copyright 2011 Jens Riisom Schultz
+ * @copyright Copyright 2012 Jens Riisom Schultz, Johannes Skov Frandsen
  * @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 set_time_limit(0);

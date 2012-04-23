@@ -1,12 +1,20 @@
 Vigu
 ====
 
-*Authors* [Jens Riisom Schultz](mailto:ibber_of_crew42@hotmail.com), [Johannes Skov Frandsen](mailto:localgod@heaven.dk)
+*Authors* [Jens Riisom Schultz](mailto:ibber_of_crew42@hotmail.com)(_backend_), [Johannes Skov Frandsen](mailto:localgod@heaven.dk)(_frontend_)
+
 *Since*   2012-03-20
 
 Vigu is a PHP error aggregation system, which collects all possible PHP errors and aggregates them in a Redis database. It includes a frontend to browse the data.
 
-This application is based on [Redis](http://redis.io) and The [Zaphod distribution](https://github.com/Ibmurai/zaphod) of [The Frood VC framework](https://github.com/Ibmurai/frood).
+This project is based on [Zaphod](https://github.com/Ibmurai/zaphod) and depends on several other projects:
+
+  * [Redis](http://redis.io)
+  * [The Frood VC framework](https://github.com/Ibmurai/frood)
+  * [FroodTwig](https://github.com/Ibmurai/froodTwig)
+  * [PHP-Daemon](https://github.com/shaneharter/PHP-Daemon)
+  * [Jquery](http://jquery.com/)
+  * [jqGrid](http://www.trirand.com/blog/)
 
 
 Requirements
@@ -31,7 +39,7 @@ Installing
   * Run `install.php` from command line.
   * Copy `vigu.ini.dist` to `vigu.ini` and edit it.
   * Make a vhost, to point at the root of vigu or the `web/` folder, or however you choose to serve the site.
-  * Copy `handlers/shutdown.ini.dist` to `handlers/shutdown.ini` and edit it.
+  * Copy `vigu.ini` to `handlers/vigu.ini`.
   * Include `handlers/shutdown.php` before anything else, preferably through php.ini's `auto_prepend_file` directive. It has no dependencies besides it's configuration file, which must exist next to it, so you can safely deploy it alone, to all your servers.
 
 

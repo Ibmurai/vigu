@@ -1,12 +1,15 @@
 <?php
 /**
- * PHP version 5
+ * This file is part of the Vigu PHP error aggregation system.
+ * @link https://github.com/Ibmurai/vigu
  *
- * @author Jens Riisom Schultz <jers@fynskemedier.dk>
+ * @copyright Copyright 2012 Jens Riisom Schultz, Johannes Skov Frandsen
+ * @license   http://www.apache.org/licenses/LICENSE-2.0
  */
-
 /**
- * @author Jens Riisom Schultz <jers@fynskemedier.dk>
+ * A controller that does nothing, really.
+ *
+ * @author Jens Riisom Schultz <ibber_of_crew42@hotmail.com>
  */
 class SitePublicControllerIndex extends SitePublicController {
 	/**

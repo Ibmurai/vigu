@@ -1,6 +1,18 @@
 <?php
 /**
- * Include this file through php.ini to gather errors from a server.
+ * Include this file through php.ini's auto_prepend_file setting to gather errors from a server.
+ *
+ * This file is part of the Vigu PHP error aggregation system.
+ * @link https://github.com/Ibmurai/vigu
+ *
+ * @copyright Copyright 2012 Jens Riisom Schultz, Johannes Skov Frandsen
+ * @license   http://www.apache.org/licenses/LICENSE-2.0
+ */
+/**
+ * This is the Vigu error handler.
+ * This class gathers errors during runtime execution, and sends them to a Redis server.
+ *
+ * @author Jens Riisom Schultz <ibber_of_crew42@hotmail.com>
  */
 class ViguErrorHandler {
 	/**
@@ -47,7 +59,7 @@ class ViguErrorHandler {
 	 * @return boolean True on success, false on failure.
 	 */
 	public static function readConfig() {
-		if (file_exists($iniFile = dirname(__FILE__) . '/vigu.ini') || file_exists($iniFile = dirname(__FILE__) . '/../vigu.ini')) {
+		if (file_exists($iniFile = dirname(__FILE__) . '/vigu.ini')) {
 			$config = parse_ini_file($iniFile, true);
 
 			if (isset($config['redis'])) {
@@ -337,13 +349,13 @@ class ViguErrorHandler {
 						$redis->exec();
 						$redis->close();
 					}
+					unset($redis);
 				} catch (RedisException $ex) {
 					// Ignore
 				}
 			}
 			self::$_log = array();
 		}
-
 	}
 }
 

@@ -1,12 +1,22 @@
 <?php
-
+/**
+ * This file is part of the Vigu PHP error aggregation system.
+ * @link https://github.com/Ibmurai/vigu
+ *
+ * @copyright Copyright 2012 Jens Riisom Schultz, Johannes Skov Frandsen
+ * @license   http://www.apache.org/licenses/LICENSE-2.0
+ */
 require_once '../lib/PHP-Daemon/Core/Daemon.php';
 require_once '../lib/PHP-Daemon/Core/PluginInterface.php';
 require_once '../lib/PHP-Daemon/Core/Lock/LockInterface.php';
 require_once '../lib/PHP-Daemon/Core/Lock/Lock.php';
 require_once '../lib/PHP-Daemon/Core/Lock/File.php';
 require_once '../lib/PHP-Daemon/Core/Plugins/Ini.php';
-
+/**
+ * The Vigu Daemon runs on the server, to process incoming errors.
+ *
+ * @author Jens Riisom Schultz <ibber_of_crew42@hotmail.com>
+ */
 class ViguDaemon extends Core_Daemon {
 	/**
 	 * @var string
@@ -81,10 +91,9 @@ class ViguDaemon extends Core_Daemon {
 	}
 
 	/**
-	 * This is where you implement any once-per-execution setup code.
+	 * Connects three Redis clients, and configures log, ttl and email notifications.
 	 *
 	 * @return null
-	 * @throws Exception
 	 */
 	protected function setup() {
 		if (isset($this->Ini['redis'])) {
@@ -127,6 +136,8 @@ class ViguDaemon extends Core_Daemon {
 	}
 
 	/**
+	 * Checks for incoming errors and processes them.
+	 *
 	 * This is where you implement the tasks you want your daemon to perform.
 	 * This method is called at the frequency defined by loop_interval.
 	 * If this method takes longer than 90% of the loop_interval, a Warning will be raised.
@@ -246,6 +257,11 @@ class ViguDaemon extends Core_Daemon {
 		$this->_indRedis->exec();
 	}
 
+	/**
+	 * Clean the indexes of timed out errors.
+	 *
+	 * @return null
+	 */
 	private function _cleanIndexes() {
 		$timeStart = microtime(true);
 
