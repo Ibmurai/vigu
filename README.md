@@ -15,11 +15,13 @@ This project is based on [Zaphod](https://github.com/Ibmurai/zaphod) and depends
   * [PHP-Daemon](https://github.com/shaneharter/PHP-Daemon)
   * [Jquery](http://jquery.com/)
   * [jqGrid](http://www.trirand.com/blog/)
+  * `git`
 
 
 Requirements
 ------------
 
+  * `git` is required for installation.
   * You need apache mod_rewrite.
   * You need the `pecl_http` PHP extension.
   * You need the [`phpredis`](https://github.com/nicolasff/phpredis) PHP extension.
@@ -39,6 +41,7 @@ Installing
   * Run `install.php` from command line.
   * Copy `vigu.ini.dist` to `vigu.ini` and edit it.
   * Make a vhost, to point at the root of vigu or the `web/` folder, or however you choose to serve the site.
+  * Set the daemon up, using `php handlers/daemon.php -I`. The daemon should be running at all times, but it may ONLY run on the Vigu server.
   * Copy `vigu.ini` to `handlers/vigu.ini`.
   * Include `handlers/shutdown.php` before anything else, preferably through php.ini's `auto_prepend_file` directive. It has no dependencies besides it's configuration file, which must exist next to it, so you can safely deploy it alone, to all your servers.
 
