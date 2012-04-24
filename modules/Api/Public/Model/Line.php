@@ -219,6 +219,7 @@ class ApiPublicModelLine extends ApiPublicModel {
 	 * @param string  $path   An optional path search string.
 	 *
 	 * @return ApiPublicModelLine[]
+	 * @throws RuntimeException if failing to create a new ApiPublicModelLine
 	 */
 	public static function getMostRecent($offset, $limit, $path = null) {
 		return self::_getByPrefix(self::TIMESTAMPS_PREFIX, $offset, $limit, $path);
@@ -232,6 +233,7 @@ class ApiPublicModelLine extends ApiPublicModel {
 	 * @param string  $path   An optional path search string.
 	 *
 	 * @return ApiPublicModelLine[]
+	 * @throws RuntimeException if failing to create a new ApiPublicModelLine
 	 */
 	public static function getMostTriggered($offset, $limit, $path = null) {
 		return self::_getByPrefix(self::COUNTS_PREFIX, $offset, $limit, $path);
@@ -271,6 +273,7 @@ class ApiPublicModelLine extends ApiPublicModel {
 	 * @param string  $path   An optional path search string.
 	 *
 	 * @return ApiPublicModelLine[]
+	 * @throws RuntimeException if failing to create a new ApiPublicModelLine
 	 */
 	private static function _getByPrefix($prefix, $offset, $limit, $path = null) {
 		$redis = self::_getIndexingRedis();

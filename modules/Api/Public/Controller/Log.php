@@ -25,41 +25,45 @@ class ApiPublicControllerLog extends ApiPublicController {
 	 */
 	public function gridAction($rows, $page, $sidx, $path) {
 		$timeStart = microtime(true);
-		$offset = $rows * ($page - 1);
-		$limit  = $rows;
-
-		switch (true) {
-			case $sidx == 'timestamp':
-				$lines = ApiPublicModelLine::getMostRecent($offset, $limit, $path);
-				break;
-			case $sidx == 'count':
-				$lines = ApiPublicModelLine::getMostTriggered($offset, $limit, $path);
-				break;
-			default:
-				throw new RuntimeException("You cannot order by $sidx.");
+		try {
+			$offset = $rows * ($page - 1);
+			$limit  = $rows;
+	
+			switch (true) {
+				case $sidx == 'timestamp':
+					$lines = ApiPublicModelLine::getMostRecent($offset, $limit, $path);
+					break;
+				case $sidx == 'count':
+					$lines = ApiPublicModelLine::getMostTriggered($offset, $limit, $path);
+					break;
+				default:
+					throw new RuntimeException("You cannot order by $sidx.");
+			}
+	
+			$total = ApiPublicModelLine::getTotal($path);
+	
+			$rows = array();
+			foreach ($lines as $line) {
+				$rows[] = array(
+					'key'  => $line->getKey(),
+					'cell' => array(
+						$line->getLevel(),
+						$line->getHost(),
+						$line->getMessage(),
+						date('Y-m-d H:i:s', $line->getLast()),
+						$line->getCount(),
+					),
+				);
+			}
+			$count = count($rows);
+	
+			$this->assign('page', $page);
+			$this->assign('total', $count > 0 ? ceil($total / $count) : 0);
+			$this->assign('records', $total);
+			$this->assign('rows', $rows);
+		} catch (RuntimeException $e) {
+			$this->assign('error', $e->getMessage());
 		}
-
-		$total = ApiPublicModelLine::getTotal($path);
-
-		$rows = array();
-		foreach ($lines as $line) {
-			$rows[] = array(
-				'key'  => $line->getKey(),
-				'cell' => array(
-					$line->getLevel(),
-					$line->getHost(),
-					$line->getMessage(),
-					date('Y-m-d H:i:s', $line->getLast()),
-					$line->getCount(),
-				),
-			);
-		}
-		$count = count($rows);
-
-		$this->assign('page', $page);
-		$this->assign('total', $count > 0 ? ceil($total / $count) : 0);
-		$this->assign('records', $total);
-		$this->assign('rows', $rows);
 		$this->assign('time', microtime(true) - $timeStart);
 	}
 
