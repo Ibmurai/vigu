@@ -169,6 +169,22 @@ div[role=document] {
 	width: auto;
 	margin: 0px 0px 0px 5px;
 	padding: 0px;
+	overflow: auto;
+}
+
+#jquery-notification {
+	background: transparent url(../images/notification.png) repeat;
+	border-radius: 12px;
+	padding: 20px;
+	cursor: pointer;
+}
+
+#jquery-notification-message {
+	font: bold 24px Helvetica, Arial, sans-serif;
+	color: #FFF;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, .5);
+	text-align: center;
+	white-space: nowrap;
 }
 
 .ui-widget {

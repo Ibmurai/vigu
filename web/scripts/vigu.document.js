@@ -19,7 +19,7 @@ Vigu.Document = (function($) {
 		     * @param {jQuery} Dom node
 			 * @param {Integer} Id of the document to render
 			 * 
-			 * @return {Object}
+			 * @return {undefined}
 			 */
 			render : function(node, key) {
 				$.ajax({
@@ -30,15 +30,33 @@ Vigu.Document = (function($) {
 					},
 					success : function(data) {
 						$("[role=document]").remove();
-						var data = data['details'];
-						var document = $('<div>').attr('role', 'document').addClass('ui-widget ui-widget-content ui-corner-all');
-						Vigu.Document.headerSection(document, data);
-						Vigu.Document.messageSection(document, data.message);
-						Vigu.Document.stacktraceSection(document, data.stacktrace);
-						Vigu.Document.contextSection(document, data.context);
-						document.appendTo(node);
+						if (data['error'] === undefined) {
+							var data = data['details'];
+							var document = $('<div>').attr('role', 'document').addClass('ui-widget ui-widget-content ui-corner-all');
+							Vigu.Document.headerSection(document, data);
+							Vigu.Document.messageSection(document, data.message);
+							Vigu.Document.stacktraceSection(document, data.stacktrace);
+							Vigu.Document.contextSection(document, data.context);
+							document.appendTo(node);
+							
+							$(window).resize(function() {
+								Vigu.Document.setDocumentSize();
+							}).trigger('resize');
+						} else {
+							Vigu.notify(data['error']);
+						}
 					}
 				});
+			},
+			/**
+			 * Set the size of the document in the interface
+			 * 
+			 * @return {undefined}
+			 */
+			setDocumentSize : function() {
+				var position = $('[role=document]').position();
+				var newSize = $(window).height() - position.top -7;
+				$('[role=document]').css({'height':newSize});
 			},
 			/**
 			 * Generate the header block

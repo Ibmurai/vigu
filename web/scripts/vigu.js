@@ -57,6 +57,24 @@ Vigu = (function($) {
 			render : function() {
 				Vigu.Toolbar.render();
 				Vigu.Grid.render();
-			}
+			},
+			/**
+			 * Notify the user about something
+			 * 
+			 * @param {string} message Message to user
+			 * 
+			 * @return void
+			 */
+			notify : function(message) {
+				jQuery.notification(message, {
+					className : 'jquery-notification',
+					duration : 2000,
+					freezeOnHover : false,
+					hideSpeed : 500,
+					position : 'center',
+					showSpeed : 500,
+					zIndex : 99999
+				});
+			},
 		};
 })(jQuery);

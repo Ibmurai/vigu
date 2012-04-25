@@ -117,7 +117,7 @@ Vigu.Grid = (function($) {
 			        	      repeatitems: true,
 			        	      cell: "cell",
 			        	      id: "key",
-			        	      userdata: "userdata",
+			        	      userdata: "error",
 			        	      subgrid: {
 			        	         root:"rows",
 			        	         repeatitems: true,
@@ -148,9 +148,17 @@ Vigu.Grid = (function($) {
 							if (firstIdOnPage != '') {
 								Vigu.Document.render(Vigu.rightColumn, firstIdOnPage);
 							}
+						},
+						loadError : function() {
+							Vigu.notify('The grid could not load.');
+						},
+						loadComplete : function(data) {
+							if (data.error !== '') {
+								Vigu.notify(data.error);
+							}
 						}
 					});
-
+			
 			$(window).bind('resize', function() {
 				$("#grid").setGridWidth(($("[role='application']").width() - 2) / 2, true);
 			}).trigger('resize');

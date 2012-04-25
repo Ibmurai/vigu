@@ -58,45 +58,51 @@ class ApiPublicControllerLog extends ApiPublicController {
 					$line->getCount(),
 				),
 			);
-		}
-		$count = count($rows);
 
-		$this->assign('page', $page);
-		$this->assign('total', $count > 0 ? ceil($total / $count) : 0);
-		$this->assign('records', $total);
-		$this->assign('rows', $rows);
+			$count = count($rows);
+
+			$this->assign('page', $page);
+			$this->assign('total', $count > 0 ? ceil($total / $limit) : 0);
+			$this->assign('records', $total);
+			$this->assign('rows', $rows);
+		}
 		$this->assign('time', microtime(true) - $timeStart);
 	}
 
 	/**
 	 * Get the details for a given log line, by key.
 	 *
-	 * @param string $key <>
+	 * @param string $key <null>
 	 *
 	 * @return void
 	 */
 	public function detailsAction($key) {
+		if ($key === null) {
+			$this->assign('error', 'No key given - cannot show details.');
+			return;
+		}
+
 		try {
 			$line = new ApiPublicModelLine($key);
-
-			$this->assign(
-			    'details',
-				array(
-					'host'       => $line->getHost(),
-					'last'       => date('Y-m-d H:i:s', $timestampMax = $line->getLast()),
-					'first'      => date('Y-m-d H:i:s', $timestampMin = $line->getFirst()),
-					'level'      => $line->getLevel(),
-					'message'    => $line->getMessage(),
-					'file'       => $line->getFile(),
-					'line'       => $line->getLine(),
-					'context'    => $line->getContext(),
-					'stacktrace' => $line->getStacktrace(),
-					'count'      => $count = $line->getCount(),
-					'frequency'  => ($count / (max(1, time() - $timestampMin))) * 3600,
-				)
-			);
-		} catch (Exception $e) {
+		} catch (RuntimeException $e) {
 			$this->assign('error', get_class($e) . ': ' . $e->getMessage());
 		}
+
+		$this->assign(
+			'details',
+			array(
+				'host'       => $line->getHost(),
+				'last'       => date('Y-m-d H:i:s', $timestampMax = $line->getLast()),
+				'first'      => date('Y-m-d H:i:s', $timestampMin = $line->getFirst()),
+				'level'      => $line->getLevel(),
+				'message'    => $line->getMessage(),
+				'file'       => $line->getFile(),
+				'line'       => $line->getLine(),
+				'context'    => $line->getContext(),
+				'stacktrace' => $line->getStacktrace(),
+				'count'      => $count = $line->getCount(),
+				'frequency'  => ($count / (max(1, time() - $timestampMin))) * 3600,
+			)
+		);
 	}
 }
