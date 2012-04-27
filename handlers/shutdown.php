@@ -86,15 +86,13 @@ class ViguErrorHandler {
 
 		if ($lastError && !preg_match('/^Uncaught exception /', $lastError['message'])) {
 			// Make sure that the last error has not already been logged
-			if ($lastLoggedError) {
-				if ($lastLoggedError
-					&& $lastError['file'] == $lastLoggedError['file']
-					&& $lastError['line'] == $lastLoggedError['line']
-					&& $lastError['message'] == $lastLoggedError['message']
-					&& self::_errnoToString($lastError['type']) == $lastLoggedError['level']) {
-					self::_send();
-					return;
-				}
+			if ($lastLoggedError
+				&& $lastError['file'] == $lastLoggedError['file']
+				&& $lastError['line'] == $lastLoggedError['line']
+				&& $lastError['message'] == $lastLoggedError['message']
+				&& self::_errnoToString($lastError['type']) == $lastLoggedError['level']) {
+				self::_send();
+				return;
 			}
 
 			self::_logError($lastError['type'], $lastError['message'], $lastError['file'], $lastError['line']);
@@ -215,7 +213,7 @@ class ViguErrorHandler {
 			'stacktrace' => self::_cleanStacktrace($stacktrace),
 		);
 
-		if (count(self::$_log) >= 100) {
+		if (count(self::$_log) >= 101) {
 			self::_send();
 		}
 	}
