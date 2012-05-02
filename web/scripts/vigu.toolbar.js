@@ -72,11 +72,22 @@ Vigu.Toolbar = (function($) {
 				.text('Reload')
 				.click(function(){
 					Vigu.Grid.reload();
-				}) 
-				.appendTo(node).button();
+				})
+				.appendTo(node)
+
+				.button();
 			$('<button>')
 				.text('Auto Reload')
-				.click(function(){
+				.click(function() {
+					if (!Vigu.Grid.autorefresh) {
+						$(this).find('span').addClass('reloadOn');
+						$('[role=toolbar] button:nth-child(4)').button("disable");
+						$('[role=toolbar] button:nth-child(3)').button("disable");
+					} else {
+						$(this).find('span').removeClass('reloadOn');
+						$('[role=toolbar] button:nth-child(4)').button("enable");
+						$('[role=toolbar] button:nth-child(3)').button("enable");
+					}
 					Vigu.Grid.autoRefresh();
 				}) 
 				.appendTo(node).button();

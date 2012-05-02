@@ -22,6 +22,10 @@ div[role=region] {
 	overflow: hidden;
 }
 
+.reloadOn {
+	color: green;
+}
+
 .messageGrid {
 	text-overflow: ellipsis;
 }
