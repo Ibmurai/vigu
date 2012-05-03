@@ -1,6 +1,7 @@
 <?php
 
 require dirname(__FILE__) . '/RedisFunctions.php';
+require dirname(__FILE__) . '/../lib/php-gearman-admin/GearmanAdmin.php';
 
 // Parse config
 msg('Reading config. ' . getcwd() . '/vigu.ini');
@@ -25,12 +26,31 @@ try {
 $client = new GearmanClient();
 $client->addServer();
 
+$admin = new GearmanAdmin();
+
+$iterations = 0;
 // Main loop
 while (true) {
+	// Dump status approx. every 5 minutes.
+	if ($iterations % 600 == 0) {
+		msg('Gearman server status:');
+		msg($admin->refreshStatus());
+		msg('Gearman server worker information:');
+		msg($admin->refreshWorkers());
+		msg('Cleaning up...');
+		$redis->cleanIndexes();
+	}
+	$iterations++;
+
 	usleep(50000);
 
-	if (count($data = $redis->getIncoming())) {
-		order($data);
+	if ($redis->getIncomingSize() > 0) {
+		$status = $admin->refreshStatus();
+		if ($status->getTotal('incoming') < $status->getAvailable('incoming') * 3) {
+			if (count($data = $redis->getIncoming())) {
+				order($data);
+			}
+		}
 	}
 
 	if (!$client->runTasks()) {

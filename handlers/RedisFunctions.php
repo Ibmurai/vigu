@@ -118,6 +118,18 @@ class RedisFunctions {
 	}
 
 	/**
+	 * Process an array of hash/timestamp combos.
+	 *
+	 * @param array $hashAndTimestamps An array containing arrays of the form [hash, timestamp].
+	 */
+	public function processMultiple(array $hashAndTimestamps) {
+		foreach ($hashAndTimestamps as $hashAndTimestamp) {
+			list($hash, $timestamp) = $hashAndTimestamp;
+			$this->process($hash, $timestamp);
+		}
+	}
+
+	/**
 	 * Store an incoming error.
 	 *
 	 * @param string     $hash
@@ -225,6 +237,17 @@ class RedisFunctions {
 		}
 
 		return $inc;
+	}
+
+	/**
+	 * Get the number of elements in the incoming queue.
+	 *
+	 * @return integer
+	 */
+	public function getIncomingSize() {
+		$this->_readys(3);
+
+		return $this->_redis->lSize('incoming');
 	}
 
 	/**

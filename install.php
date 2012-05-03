@@ -29,6 +29,11 @@ $libs = array(
 		'url' => 'http://github.com/shaneharter/PHP-Daemon.git',
 		'ver' => 'origin/master'
 	),
+	array(
+		'lib' => 'php-gearman-admin',
+		'url' => 'http://github.com/Ibmurai/php-gearman-admin.git',
+		'ver' => 'v.1.0'
+	),
 );
 
 foreach ($libs as $lib) {

@@ -13,6 +13,7 @@ This project is based on [Zaphod](https://github.com/Ibmurai/zaphod) and depends
   * [The Frood VC framework](https://github.com/Ibmurai/frood)
   * [FroodTwig](https://github.com/Ibmurai/froodTwig)
   * [PHP-Daemon](https://github.com/shaneharter/PHP-Daemon)
+  * [php-gearman-admin](https://github.com/Ibmurai/php-gearman-admin)
   * [Jquery](http://jquery.com/)
   * [jqGrid](http://www.trirand.com/blog/)
   * `git`
