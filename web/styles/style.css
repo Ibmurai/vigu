@@ -37,6 +37,10 @@ div[role=region] {
 	font-family: monospace;
 }
 
+.stacktrace p {
+	word-break: break-all;
+}
+
 .stacktrace p span:nth-child(1) span {
 	font-weight: bold;
 	color: fuchsia;
@@ -48,9 +52,10 @@ div[role=region] {
 }
 
 .stacktrace p span:nth-child(3) span {
-	
+
 	font-weight: bold;
 	color: green;
+	cursor: pointer;
 }
 
 .stacktrace p span:nth-child(3) span:hover {
