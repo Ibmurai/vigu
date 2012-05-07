@@ -38,7 +38,7 @@ Documentation
 Installing
 ----------
 
-  * Clone vigu from git.
+  * Clone vigu from git, i.e. `git clone http://github.com/Ibmurai/vigu.git vigu`
   * Run `install.php` from command line.
   * Copy `vigu.ini.dist` to `vigu.ini` and edit it.
   * Make a vhost, to point at the root of vigu or the `web/` folder, or however you choose to serve the site.
