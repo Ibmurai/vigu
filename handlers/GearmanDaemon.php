@@ -13,6 +13,7 @@ require_once dirname(__FILE__) . '/../lib/PHP-Daemon/Core/Lock/Lock.php';
 require_once dirname(__FILE__) . '/../lib/PHP-Daemon/Core/Lock/File.php';
 require_once dirname(__FILE__) . '/../lib/PHP-Daemon/Core/Plugins/Ini.php';
 require_once dirname(__FILE__) . '/RedisFunctions.php';
+require_once dirname(__FILE__) . '/../lib/php-gearman-admin/GearmanAdmin.php';
 /**
  * The Vigu Daemon runs on the server, to process incoming errors.
  *
@@ -118,14 +119,14 @@ class ViguGearmanDaemon extends Core_Daemon {
 	 * @return null
 	 */
 	protected function execute() {
-		if ($this->_ticks++ % 60) {
+		if ($this->_ticks++ % 60 == 0) {
 			$this->_cleanupAndCheckWorkers();
 		}
 
 		if ($this->_redis->getIncomingSize() > 0) {
 			$status = $this->_gearmanAdmin->refreshStatus();
 			if ($status->getTotal('incoming') < $status->getAvailable('incoming') * 3) {
-				if (count($data = $redis->getIncoming())) {
+				if (count($data = $this->_redis->getIncoming())) {
 					$this->_order($data);
 				}
 			}
@@ -145,7 +146,7 @@ class ViguGearmanDaemon extends Core_Daemon {
 	private function _cleanupAndCheckWorkers() {
 		$this->log('Cleaning up...');
 		$this->_redis->cleanIndexes();
-		if (($missing = $this->Ini['gearman']['workers'] - $admin->refreshStatus()->getAvailable('incoming')) > 0) {
+		if (($missing = $this->Ini['gearman']['workers'] - $this->_gearmanAdmin->refreshStatus()->getAvailable('incoming')) > 0) {
 			$this->log("I'm missing $missing peons...");
 			for ($i = 0; $i < $missing; $i++) {
 				$this->_newPeon();
