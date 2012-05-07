@@ -230,11 +230,9 @@ class RedisFunctions {
 	public function getIncoming($limit = 1000) {
 		$this->_readys(3);
 
-		$inc = array();
-		$count = 0;
-		while (($pair = $this->_redis->lPop('incoming')) && $count++ < $limit) {
-			$inc[] = $pair;
-		}
+		$amount = min($limit, $this->getIncomingSize());
+		$inc = $this->_redis->lGetRange('incoming', 0, $amount - 1);
+		$this->_redis->lTrim('incoming', $amount, -1);
 
 		return $inc;
 	}
