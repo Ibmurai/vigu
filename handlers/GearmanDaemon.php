@@ -45,7 +45,7 @@ class ViguGearmanDaemon extends Core_Daemon {
 		$this->lock = new Core_Lock_File();
 		$this->lock->daemon_name = __CLASS__;
 		$this->lock->ttl = $this->loop_interval;
-		$this->lock->path = '/var/run/';
+		$this->lock->path = '/vigu/';
 
 		parent::__construct();
 	}
@@ -123,12 +123,12 @@ class ViguGearmanDaemon extends Core_Daemon {
 			$this->_cleanupAndCheckWorkers();
 		}
 
-		if ($this->_redis->getIncomingSize() > 0) {
+		if (($incSize = $this->_redis->getIncomingSize()) > 0) {
+			$this->log("$incSize items queued in Redis...");
 			$status = $this->_gearmanAdmin->refreshStatus();
-			if ($status->getTotal('incoming') < $status->getAvailable('incoming') * 3) {
-				if (count($data = $this->_redis->getIncoming())) {
-					$this->_order($data);
-				}
+			$maxJobsToSchedule = $status->getAvailable('incoming') * 3 - $status->getTotal('incoming');
+			while ($maxJobsToSchedule-- > 0 && count($data = $this->_redis->getIncoming())) {
+				$this->_order($data);
 			}
 		}
 

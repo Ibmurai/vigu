@@ -16,16 +16,16 @@ class ApiPublicControllerLog extends ApiPublicController {
 	/**
 	 * Data for the frontend table.
 	 *
-	 * @param integer $rows        <10>        Number of rows to return
-	 * @param integer $page        <1>         Result offset
-	 * @param string  $sidx        <timestamp> Field to sort by, 'timestamp' or 'count'.
-	 * @param string  $path        <null>      Limit search to match a specific path (default is null = any file path)
-	 * @param boolean $handled     <false>     Set to true, to not filter handled errors out.
-	 * @param string  $levelFilter <null>      Set this to an error level, to only get errors of that level.
+	 * @param integer $rows    <10>        Number of rows to return
+	 * @param integer $page    <1>         Result offset
+	 * @param string  $sidx    <timestamp> Field to sort by, 'timestamp' or 'count'.
+	 * @param string  $path    <null>      Limit search to match a specific path (default is null = any file path)
+	 * @param boolean $handled <false>     Set to true, to not filter handled errors out.
+	 * @param string  $level   <null>      Set this to an error level, to only get errors of that level.
 	 *
 	 * @return void
 	 */
-	public function gridAction($rows, $page, $sidx, $path, $handled, $levelFilter) {
+	public function gridAction($rows, $page, $sidx, $path, $handled, $level) {
 		$timeStart = microtime(true);
 		$offset = $rows * ($page - 1);
 		$limit  = $rows;
@@ -33,16 +33,16 @@ class ApiPublicControllerLog extends ApiPublicController {
 		try {
 			switch (true) {
 				case $sidx == 'timestamp':
-					$lines = ApiPublicModelLine::getMostRecent($offset, $limit, $path);
+					$lines = ApiPublicModelLine::getMostRecent($offset, $limit, $path, $level);
 					break;
 				case $sidx == 'count':
-					$lines = ApiPublicModelLine::getMostTriggered($offset, $limit, $path);
+					$lines = ApiPublicModelLine::getMostTriggered($offset, $limit, $path, $level);
 					break;
 				default:
 					throw new RuntimeException("You cannot order by $sidx.");
 			}
 
-			$total = ApiPublicModelLine::getTotal($path);
+			$total = ApiPublicModelLine::getTotal($path, $level);
 		} catch (RuntimeException $ex) {
 			$this->assign('error', $ex->getMessage());
 			return;
@@ -114,11 +114,7 @@ class ApiPublicControllerLog extends ApiPublicController {
 	 * @return void
 	 */
 	public function errorLevelsAction() {
-		$this->assign('levels', array(
-			'ERROR',
-			'NOTICE',
-			'WARNING',
-		));
+		$this->assign('levels', array('NOTICE'));
 	}
 
 	/**

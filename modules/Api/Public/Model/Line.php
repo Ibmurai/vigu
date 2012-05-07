@@ -8,7 +8,7 @@
  */
 /**
  * Logged lines as a model.
- * 
+ *
  * @author Jens Riisom Schultz <ibber_of_crew42@hotmail.com>
  */
 class ApiPublicModelLine extends ApiPublicModel {
@@ -26,6 +26,11 @@ class ApiPublicModelLine extends ApiPublicModel {
 	 * @var string
 	 */
 	const SEARCH_PREFIX = '|search|';
+
+	/**
+	 * @var string
+	 */
+	const LEVEL_PREFIX = '|level|';
 
 	/**
 	 * @var Redis
@@ -212,17 +217,27 @@ class ApiPublicModelLine extends ApiPublicModel {
 	}
 
 	/**
+	 * Get an error of all registered error levels.
+	 *
+	 * @return array
+	 */
+	public static function getAllLevels() {
+
+	}
+
+	/**
 	 * Get lines ordered by their last timestamp, descending.
 	 *
 	 * @param integer $offset
 	 * @param integer $limit
 	 * @param string  $path   An optional path search string.
+	 * @param string  $level  An optional error level to filter by.
 	 *
 	 * @return ApiPublicModelLine[]
 	 * @throws RuntimeException if failing to create a new ApiPublicModelLine
 	 */
-	public static function getMostRecent($offset, $limit, $path = null) {
-		return self::_getByPrefix(self::TIMESTAMPS_PREFIX, $offset, $limit, $path);
+	public static function getMostRecent($offset, $limit, $path = null, $level = null) {
+		return self::_getByPrefix(self::TIMESTAMPS_PREFIX, $offset, $limit, $path, $level);
 	}
 
 	/**
@@ -231,22 +246,24 @@ class ApiPublicModelLine extends ApiPublicModel {
 	 * @param integer $offset
 	 * @param integer $limit
 	 * @param string  $path   An optional path search string.
+	 * @param string  $level  An optional error level to filter by.
 	 *
 	 * @return ApiPublicModelLine[]
 	 * @throws RuntimeException if failing to create a new ApiPublicModelLine
 	 */
-	public static function getMostTriggered($offset, $limit, $path = null) {
-		return self::_getByPrefix(self::COUNTS_PREFIX, $offset, $limit, $path);
+	public static function getMostTriggered($offset, $limit, $path = null, $level = null) {
+		return self::_getByPrefix(self::COUNTS_PREFIX, $offset, $limit, $path, $level);
 	}
 
 	/**
 	 * Get the total number of lines.
 	 *
-	 * @param string $path An optional path search string.
+	 * @param string $path  An optional path search string.
+	 * @param string $level An optional error level to filter by.
 	 *
 	 * @return integer
 	 */
-	public static function getTotal($path = null) {
+	public static function getTotal($path = null, $level = null) {
 		$redis = self::_getIndexingRedis();
 
 		if ($path === null) {
@@ -259,6 +276,14 @@ class ApiPublicModelLine extends ApiPublicModel {
 
 			$id = uniqid(self::SEARCH_PREFIX, true);
 			$total = $redis->zInter($id, $search);
+
+			if ($level !== null) {
+				$oldId = $id;
+				$id = uniqid(self::SEARCH_PREFIX, true);
+				$total = $redis->zInter($id, array($oldId, self::LEVEL_PREFIX . $level));
+				$redis->del($oldId);
+			}
+
 			$redis->del($id);
 
 			return $total;
@@ -268,23 +293,33 @@ class ApiPublicModelLine extends ApiPublicModel {
 	/**
 	 * Get lines ordered by timestamp or count, descending.
 	 *
+	 * @param string  $prefix The index prefix.
 	 * @param integer $offset
 	 * @param integer $limit
 	 * @param string  $path   An optional path search string.
+	 * @param string  $level  An optional error level to filter by.
 	 *
 	 * @return ApiPublicModelLine[]
-	 * @throws RuntimeException if failing to create a new ApiPublicModelLine
 	 */
-	private static function _getByPrefix($prefix, $offset, $limit, $path = null) {
+	private static function _getByPrefix($prefix, $offset, $limit, $path = null, $level = null) {
 		$redis = self::_getIndexingRedis();
 		$start = $offset;
 		$end   = $start + ($limit - 1);
 
 		$result = array();
-		if ($path === null) {
+		if ($path === null && $level === null) {
 			foreach ($redis->zRevRange($prefix, $start, $end) as $key) {
 				$result[] = new ApiPublicModelLine($key);
 			}
+		} else if ($path === null) {
+			$id = uniqid(self::SEARCH_PREFIX, true);
+			$redis->zInter($id, array($prefix, self::LEVEL_PREFIX . $level));
+
+			foreach ($redis->zRevRange($id, $start, $end) as $key) {
+				$result[] = new ApiPublicModelLine($key);
+			}
+
+			$redis->del($id);
 		} else {
 			$search = self::_splitPath($path);
 			foreach ($search as &$val) {
@@ -293,9 +328,18 @@ class ApiPublicModelLine extends ApiPublicModel {
 
 			$id = uniqid(self::SEARCH_PREFIX, true);
 			$redis->zInter($id, $search);
+
+			if ($level !== null) {
+				$oldId = $id;
+				$id = uniqid(self::SEARCH_PREFIX, true);
+				$redis->zInter($id, array($oldId, self::LEVEL_PREFIX . $level));
+				$redis->del($oldId);
+			}
+
 			foreach ($redis->zRevRange($id, $start, $end) as $key) {
 				$result[] = new ApiPublicModelLine($key);
 			}
+
 			$redis->del($id);
 		}
 

@@ -16,6 +16,9 @@ class RedisFunctions {
 	/** @var string The prefix to use for timestamps indexes. */
 	const TIMESTAMPS_PREFIX = '|timestamps|';
 
+	/** @var string The prefix to use for the error level indexes. */
+	const LEVEL_PREFIX = '|level|';
+
 	/** @var string The prefix to use for temporary indexes. */
 	const SEARCH_PREFIX = '|search|';
 
@@ -196,6 +199,8 @@ class RedisFunctions {
 			$this->_redis->zAdd(self::TIMESTAMPS_PREFIX . strtolower($word), $timestamp, $hash);
 			$this->_redis->zAdd(self::COUNTS_PREFIX . strtolower($word), $count, $hash);
 		}
+		$this->_redis->zAdd(self::LEVEL_PREFIX . $line['level'], 1.0, $hash);
+
 		$this->_redis->exec();
 	}
 
