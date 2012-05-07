@@ -143,10 +143,12 @@ Vigu.Grid = (function($) {
 					    	}
 						},
 						gridComplete: function() {
-							var firstIdOnPage = $("[role='grid']").getDataIDs()[0];
-							$('.ui-grid-ico-sort.ui-icon-desc.ui-sort-ltr').hide();
-							if (firstIdOnPage != '') {
-								Vigu.Document.render(Vigu.rightColumn, firstIdOnPage);
+							if (!Vigu.Grid.autorefresh) {
+								var firstIdOnPage = $("[role='grid']").getDataIDs()[0];
+								$('.ui-grid-ico-sort.ui-icon-desc.ui-sort-ltr').hide();
+								if (firstIdOnPage != '') {
+									Vigu.Document.render(Vigu.rightColumn, firstIdOnPage);
+								}
 							}
 						},
 						loadError : function() {
