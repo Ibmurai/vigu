@@ -16,14 +16,16 @@ class ApiPublicControllerLog extends ApiPublicController {
 	/**
 	 * Data for the frontend table.
 	 *
-	 * @param integer $rows <10>        Number of rows to return
-	 * @param integer $page <1>         Result offset
-	 * @param string  $sidx <timestamp> Field to sort by, 'timestamp' or 'count'.
-	 * @param string  $path <null>      Limit search to match a specific path (default is null = any file path)
+	 * @param integer $rows        <10>        Number of rows to return
+	 * @param integer $page        <1>         Result offset
+	 * @param string  $sidx        <timestamp> Field to sort by, 'timestamp' or 'count'.
+	 * @param string  $path        <null>      Limit search to match a specific path (default is null = any file path)
+	 * @param boolean $handled     <false>     Set to true, to not filter handled errors out.
+	 * @param string  $levelFilter <null>      Set this to an error level, to only get errors of that level.
 	 *
 	 * @return void
 	 */
-	public function gridAction($rows, $page, $sidx, $path) {
+	public function gridAction($rows, $page, $sidx, $path, $handled, $levelFilter) {
 		$timeStart = microtime(true);
 		$offset = $rows * ($page - 1);
 		$limit  = $rows;
@@ -104,5 +106,45 @@ class ApiPublicControllerLog extends ApiPublicController {
 				'frequency'  => ($count / (max(1, time() - $timestampMin))) * 3600,
 			)
 		);
+	}
+
+	public function requestDetailsAction($url) {
+		$this->assign('details', array(
+			'best' => 0.428487,
+			'mean' => 1.3872733,
+			'worst' => 42.79387829,
+			'count' => 42,
+		));
+	}
+
+	/**
+	 * Get all registered error levels.
+	 *
+	 * @return void
+	 */
+	public function errorLevelsAction() {
+		$this->assign('levels', array(
+			'ERROR',
+			'NOTICE',
+			'WARNING',
+		));
+	}
+
+	/**
+	 * Mark an error as handled. It will stay handled for the configured ttl.
+	 *
+	 * @param string $key The key of the error to mark.
+	 */
+	public function handleAction($key) {
+		$this->doOutputDisabled();
+	}
+
+	/**
+	 * Unmark a previously handled error.
+	 *
+	 * @param type $key The key of the error to unmark.
+	 */
+	public function unHandleAction($key) {
+		$this->doOutputDisabled();
 	}
 }
