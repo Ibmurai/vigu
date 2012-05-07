@@ -161,6 +161,19 @@ Vigu.Grid = (function($) {
 						}
 					});
 			
+			$("#grid").jqGrid('navGrid','#pager',{search:false,edit:false,add:false,del:false});
+			$("#grid").jqGrid('navSeparatorAdd','#pager',{});
+			$("#grid").jqGrid('navButtonAdd','#pager',{caption:"Auto Reload", buttonicon:"none", onClickButton:function(){ 
+				if (!Vigu.Grid.autorefresh) {
+					Vigu.notify("Enabled auto reload");
+					$("#pager_left div:contains('Auto Reload')").addClass('reloadOn');
+				} else {
+					$("#pager_left div:contains('Auto Reload')").removeClass('reloadOn');
+					Vigu.notify("Disabled auto reload");
+				}
+				Vigu.Grid.autoRefresh();
+			} });
+			
 			$(window).bind('resize', function() {
 				$("#grid").setGridWidth(($("[role='application']").width() - 2) / 2, true);
 			}).trigger('resize');

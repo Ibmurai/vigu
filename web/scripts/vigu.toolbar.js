@@ -78,27 +78,6 @@ Vigu.Toolbar = (function($) {
 						}
 					}))
 				.appendTo(node);
-			$('<button>')
-				.text('Reload')
-				.click(function(){
-					Vigu.Grid.reload();
-				})
-				.appendTo(node)
-
-				.button();
-			$('<button>')
-				.text('Auto Reload')
-				.click(function() {
-					if (!Vigu.Grid.autorefresh) {
-						$(this).find('span').addClass('reloadOn');
-						$('[role=toolbar] button:nth-child(3)').button("disable");
-					} else {
-						$(this).find('span').removeClass('reloadOn');
-						$('[role=toolbar] button:nth-child(3)').button("enable");
-					}
-					Vigu.Grid.autoRefresh();
-				}) 
-				.appendTo(node).button();
 		}
 	};
 })(jQuery);
