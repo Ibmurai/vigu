@@ -104,7 +104,7 @@ Vigu.Grid = (function($) {
 						colNames : [ 'Level', 'Host', 'Message', 'Last', 'Count'],
 						colModel : [
 						             {name : 'level',     index : 'level',     resizable : false, sortable : false, width : 120,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter},
-						             {name : 'host',      index : 'host',      resizable : false, sortable : false, width : 150,  align: 'center', fixed : true, title : false},
+						             {name : 'host',      index : 'host',      resizable : false, sortable : false, width : 150,  align: 'center', fixed : true},
 						             {name : 'message',   index : 'message',   classes : 'messageGrid', sortable : false, formatter : Vigu.Grid.messageFormatter},
 						             {name : 'timestamp', index : 'timestamp', resizable : false, width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter},
 						             {name : 'count',     index : 'count',     resizable : false, width : 60,  align: 'center', fixed : true, title : false}
@@ -143,10 +143,12 @@ Vigu.Grid = (function($) {
 					    	}
 						},
 						gridComplete: function() {
-							var firstIdOnPage = $("[role='grid']").getDataIDs()[0];
-							$('.ui-grid-ico-sort.ui-icon-desc.ui-sort-ltr').hide();
-							if (firstIdOnPage != '') {
-								Vigu.Document.render(Vigu.rightColumn, firstIdOnPage);
+							if (!Vigu.Grid.autorefresh) {
+								var firstIdOnPage = $("[role='grid']").getDataIDs()[0];
+								$('.ui-grid-ico-sort.ui-icon-desc.ui-sort-ltr').hide();
+								if (firstIdOnPage != '') {
+									Vigu.Document.render(Vigu.rightColumn, firstIdOnPage);
+								}
 							}
 						},
 						loadError : function() {
@@ -158,6 +160,19 @@ Vigu.Grid = (function($) {
 							}
 						}
 					});
+			
+			$("#grid").jqGrid('navGrid','#pager',{search:false,edit:false,add:false,del:false});
+			$("#grid").jqGrid('navSeparatorAdd','#pager',{});
+			$("#grid").jqGrid('navButtonAdd','#pager',{caption:"Auto Reload", buttonicon:"none", onClickButton:function(){ 
+				if (!Vigu.Grid.autorefresh) {
+					Vigu.notify("Enabled auto reload");
+					$("#pager_left div:contains('Auto Reload')").addClass('reloadOn');
+				} else {
+					$("#pager_left div:contains('Auto Reload')").removeClass('reloadOn');
+					Vigu.notify("Disabled auto reload");
+				}
+				Vigu.Grid.autoRefresh();
+			} });
 			
 			$(window).bind('resize', function() {
 				$("#grid").setGridWidth(($("[role='application']").width() - 2) / 2, true);
@@ -175,8 +190,11 @@ Vigu.Grid = (function($) {
 		 * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:custom_formatter
 		 */
 		messageFormatter : function(cellvalue, options, rowObject) {
-			var newValue = cellvalue.replace(/(href=\W?)/, 'target="ref" $1http://dk.php.net/manual/en/');
-			return newValue;
+			if (cellvalue != null) {
+				var newValue = cellvalue.replace(/(href=\W?)/, 'target="ref" $1http://dk.php.net/manual/en/');
+				return newValue;		
+			}
+			return '';
 		},
 		/**
 		 * Formats the level
@@ -189,12 +207,15 @@ Vigu.Grid = (function($) {
 		 * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:custom_formatter
 		 */
 		levelFormatter : function(cellvalue, options, rowObject) {
-			var lower = cellvalue.toLowerCase();
-			var className = 'errorlevel_'+ lower.replace(' error', '_error')
-												.replace(' warning', '_warning')
-												.replace(' notice', '_notice')
-												.replace(' deprecated', '_deprecated');
-			return '<span class="'+ className +'">' + lower.charAt(0).toUpperCase() + lower.slice(1) + '</span>';
+			if (cellvalue != null) {
+				var lower = cellvalue.toLowerCase();
+				var className = 'errorlevel_'+ lower.replace(' error', '_error')
+													.replace(' warning', '_warning')
+													.replace(' notice', '_notice')
+													.replace(' deprecated', '_deprecated');
+				return '<span class="'+ className +'">' + lower.charAt(0).toUpperCase() + lower.slice(1) + '</span>';
+			}
+			return '';
 		},
 		/**
 		 * Formats the date
@@ -207,23 +228,26 @@ Vigu.Grid = (function($) {
 		 * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:custom_formatter
 		 */
 		agoFormatter : function(cellvalue, options, rowObject) {
-			var date = new Date((cellvalue || "").replace(/-/g,"/").replace(/[TZ]/g," "));
-			var diff = (((new Date()).getTime() - date.getTime()) / 1000),
-			day_diff = Math.floor(diff / 86400);
-
-			if (isNaN(day_diff) || day_diff < 0 || day_diff >= 31 ) {
-				return cellvalue;
+			if (cellvalue != null) {
+				var date = new Date((cellvalue || "").replace(/-/g,"/").replace(/[TZ]/g," "));
+				var diff = (((new Date()).getTime() - date.getTime()) / 1000),
+				day_diff = Math.floor(diff / 86400);
+	
+				if (isNaN(day_diff) || day_diff < 0 || day_diff >= 31 ) {
+					return cellvalue;
+				}
+	
+				return day_diff == 0 && (
+						diff < 60 && "just now" ||
+						diff < 120 && "1 minute ago" ||
+						diff < 3600 && Math.floor( diff / 60 ) + " minutes ago" ||
+						diff < 7200 && "1 hour ago" ||
+						diff < 86400 && Math.floor( diff / 3600 ) + " hours ago") ||
+					day_diff == 1 && "Yesterday" ||
+					day_diff < 7 && day_diff + " days ago" ||
+					day_diff < 31 && Math.ceil( day_diff / 7 ) + " weeks ago";
 			}
-
-			return day_diff == 0 && (
-					diff < 60 && "just now" ||
-					diff < 120 && "1 minute ago" ||
-					diff < 3600 && Math.floor( diff / 60 ) + " minutes ago" ||
-					diff < 7200 && "1 hour ago" ||
-					diff < 86400 && Math.floor( diff / 3600 ) + " hours ago") ||
-				day_diff == 1 && "Yesterday" ||
-				day_diff < 7 && day_diff + " days ago" ||
-				day_diff < 31 && Math.ceil( day_diff / 7 ) + " weeks ago";
+			return '';
 		},
 		/**
 		 * Construct the query string
