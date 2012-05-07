@@ -108,15 +108,6 @@ class ApiPublicControllerLog extends ApiPublicController {
 		);
 	}
 
-	public function requestDetailsAction($url) {
-		$this->assign('details', array(
-			'best' => 0.428487,
-			'mean' => 1.3872733,
-			'worst' => 42.79387829,
-			'count' => 42,
-		));
-	}
-
 	/**
 	 * Get all registered error levels.
 	 *
