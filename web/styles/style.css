@@ -142,6 +142,11 @@ div[role=toolbar] {
 	height: 28px;
 }
 
+div[role=toolbar] a {
+	float: right;
+	margin-right: 5px;
+}
+
 div[role=toolbar] label {
 	float: right;
 	width: 50%;

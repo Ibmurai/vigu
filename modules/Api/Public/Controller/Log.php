@@ -68,6 +68,24 @@ class ApiPublicControllerLog extends ApiPublicController {
 		}
 		$this->assign('time', microtime(true) - $timeStart);
 	}
+	/**
+	 * Error levels
+	 * 
+	 * @return void
+	 */
+	public function errorLevelsAction() {
+		if (true) { //Things goes as planed
+			$this->assign(
+				'levels', 
+				array(
+					'ERROR',
+					'WARNING',
+				)
+			);
+		} else {
+			$this->assign('error', 'Could not get error levels');
+		}
+	}
 
 	/**
 	 * Get the details for a given log line, by key.
