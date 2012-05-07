@@ -48,7 +48,6 @@ div[role=region] {
 }
 
 .stacktrace p span:nth-child(3) span {
-	
 	font-weight: bold;
 	color: green;
 }
@@ -139,8 +138,30 @@ div.fields dd.file_search:hover {
 
 div[role=toolbar] {
 	margin: 5px 0px;
-	padding: 2px;
+	padding: 2px 8px 2px 2px;
 	height: 28px;
+}
+
+div[role=toolbar] label {
+	float: right;
+	width: 50%;
+}
+
+div[role=toolbar] label span {
+	position: absolute;
+	top: 17px;
+	right: 17px;
+	cursor: pointer;
+	display: table-cell;
+}
+
+div[role=toolbar] label input[type=text] {
+	margin: 0px;
+	padding: 2px;
+	border: 1px solid #AAAAAA;
+	font-size: 16px;
+	height: 22px;
+	width: 100%;
 }
 
 div[role=toolbar] h1 {
@@ -148,16 +169,6 @@ div[role=toolbar] h1 {
 	padding: 2px;
 	float: left;
 	font-size: 20px;
-}
-
-div[role=toolbar] input[type=text] {
-	margin: 0px;
-	padding: 2px;
-	float: right;
-	border: 1px solid #AAAAAA;
-	font-size: 16px;
-	height: 22px;
-	width: 49%;
 }
 
 div[role=toolbar] button {
