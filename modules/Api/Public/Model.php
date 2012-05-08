@@ -45,7 +45,7 @@ class ApiPublicModel {
 	 */
 	private static function _readConfig() {
 		if (file_exists($iniFile = dirname(__FILE__) . '/../../../vigu.ini')) {
-			self::$_config = parse_ini_file($iniFile);
+			self::$_config = parse_ini_file($iniFile, true);
 		} else {
 			trigger_error('Could not locate vigu.ini.', E_USER_WARNING);
 		}
