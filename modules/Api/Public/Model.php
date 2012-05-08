@@ -31,11 +31,11 @@ class ApiPublicModel {
 			self::_readConfig();
 		}
 
-		if (!isset(self::$_config[$option])) {
-			throw new RuntimeException("The configuration option, $option, has not been defined in vigu.ini.");
+		if (!isset(self::$_config['redis'][$option])) {
+			throw new RuntimeException("The configuration option, [redis] $option, has not been defined in vigu.ini.");
 		}
 
-		return self::$_config[$option];
+		return self::$_config['redis'][$option];
 	}
 
 	/**
