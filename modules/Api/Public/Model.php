@@ -31,11 +31,11 @@ class ApiPublicModel {
 			self::_readConfig();
 		}
 
-		if (!isset(self::$_config[$option])) {
-			throw new RuntimeException("The configuration option, $option, has not been defined in vigu.ini.");
+		if (!isset(self::$_config['redis'][$option])) {
+			throw new RuntimeException("The configuration option, [redis] $option, has not been defined in vigu.ini.");
 		}
 
-		return self::$_config[$option];
+		return self::$_config['redis'][$option];
 	}
 
 	/**
@@ -45,7 +45,7 @@ class ApiPublicModel {
 	 */
 	private static function _readConfig() {
 		if (file_exists($iniFile = dirname(__FILE__) . '/../../../vigu.ini')) {
-			self::$_config = parse_ini_file($iniFile);
+			self::$_config = parse_ini_file($iniFile, true);
 		} else {
 			trigger_error('Could not locate vigu.ini.', E_USER_WARNING);
 		}
