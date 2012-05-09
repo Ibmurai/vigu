@@ -85,10 +85,12 @@ Vigu.Document = (function($) {
 				$('<dd>').text(data.frequency.toPrecision(2)).attr('title', data.frequency).appendTo(dl);
 				$('<dt>').text('File').appendTo(dl);
 				$('<dd>').text(data.file).addClass('file_search').attr('title', data.file).click(function(){
-				     Vigu.Grid.parameters.path = data.file;
-				     $('input[name="search"]').val(data.file);
-				     Vigu.Grid.reload();
-					}).appendTo(dl);
+				    Vigu.Grid.parameters.path = data.file;
+				    $('input[name="search"]').val(data.file);
+					Vigu.Toolbar.updateSearchReset();
+
+				    Vigu.Grid.reload();
+				}).appendTo(dl);
 				$('<dt>').text('Line').appendTo(dl);
 				$('<dd>').text(data.line).appendTo(dl);
 				dl.appendTo(right);
