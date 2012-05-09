@@ -32,10 +32,10 @@ Vigu.Grid = (function($) {
 		 */
 		parameters : {
 			/**
-			 * Module to limit search by
+			 * Limit the seach to handled errors
 			 * @type {String}
 			 */
-			module : '',
+			handled : false,
 			/**
 			 * Host to limit search by
 			 * @type {String}
