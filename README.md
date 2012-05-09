@@ -7,26 +7,30 @@ Vigu
 
 Vigu is a PHP error aggregation system, which collects all possible PHP errors and aggregates them in a Redis database. It includes a frontend to browse the data.
 
-This project is based on [Zaphod](https://github.com/Ibmurai/zaphod) and depends on several other projects:
+This project is based on [Zaphod](https://github.com/Ibmurai/zaphod) and uses several other projects:
 
   * [Redis](http://redis.io)
   * [The Frood VC framework](https://github.com/Ibmurai/frood)
   * [FroodTwig](https://github.com/Ibmurai/froodTwig)
   * [PHP-Daemon](https://github.com/shaneharter/PHP-Daemon)
-  * [php-gearman-admin](https://github.com/Ibmurai/php-gearman-admin)
   * [Jquery](http://jquery.com/)
   * [jqGrid](http://www.trirand.com/blog/)
-  * `git`
-
+  * [git](http://git-scm.com/)
+  
 
 Requirements
 ------------
 
   * `git` is required for installation.
-  * You need apache mod_rewrite.
-  * You need the `pecl_http` PHP extension.
-  * You need the [`phpredis`](https://github.com/nicolasff/phpredis) PHP extension.
+  * You need apache `mod_rewrite`.
+  * You need the [phpredis](https://github.com/nicolasff/phpredis) PHP extension.
   * You need a Redis server, dedicated to this application.
+
+Optionally you can use a gearman based variant of the daemon, adding the following dependencies:
+
+  * [Gearman](http://gearman.org/)
+  * [pecl_gearman](http://pecl.php.net/package/gearman)
+  * [php-gearman-admin](https://github.com/Ibmurai/php-gearman-admin)
 
 
 Documentation
