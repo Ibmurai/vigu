@@ -144,6 +144,7 @@ Vigu.Grid = (function($) {
 						gridComplete: function() {
 							if (!Vigu.Grid.autorefresh) {
 								var firstIdOnPage = $("[role='grid']").getDataIDs()[0];
+								$("#grid").setSelection (firstIdOnPage, true);
 								$('.ui-grid-ico-sort.ui-icon-desc.ui-sort-ltr').hide();
 								if (firstIdOnPage != '') {
 									Vigu.Document.render(Vigu.rightColumn, firstIdOnPage);
