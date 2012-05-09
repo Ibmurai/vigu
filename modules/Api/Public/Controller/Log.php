@@ -114,7 +114,7 @@ class ApiPublicControllerLog extends ApiPublicController {
 	 * @return void
 	 */
 	public function errorLevelsAction() {
-		$this->assign('levels', array('NOTICE'));
+		$this->assign('levels', ApiPublicModelLine::getAllLevels());
 	}
 
 	/**

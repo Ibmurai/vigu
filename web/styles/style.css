@@ -152,12 +152,12 @@ div[role=toolbar] a {
 	margin-right: 5px;
 }
 
-div[role=toolbar] label {
+div[role=toolbar] div.search {
 	float: right;
 	width: 50%;
 }
 
-div[role=toolbar] label span {
+div[role=toolbar] div.search span {
 	position: absolute;
 	top: 17px;
 	right: 17px;
@@ -165,7 +165,7 @@ div[role=toolbar] label span {
 	display: table-cell;
 }
 
-div[role=toolbar] label input[type=text] {
+div[role=toolbar] div.search input[type=text] {
 	margin: 0px;
 	padding: 2px;
 	border: 1px solid #AAAAAA;
@@ -183,6 +183,19 @@ div[role=toolbar] h1 {
 
 div[role=toolbar] button {
 	float: right;
+}
+
+div[role=toolbar] label:after {
+	content: '\a0';
+}
+
+div[role=toolbar] label {
+	float: right;
+	vertical-align: baseline;
+	line-height: 28px;
+	font-family: Verdana,Arial,sans-serif;
+	font-size: 12px;
+	font-weight: bold;
 }
 
 table[role=grid] {

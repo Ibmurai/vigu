@@ -38,10 +38,10 @@ Vigu.Toolbar = (function($) {
 		},
 		/**
 		 * Get errorlevels
-		 * 
+		 *
 		 * @param {jQuery} node Node
-		 * 
-		 * @return {undefiend}
+		 *
+		 * @return {undefined}
 		 */
 		getErrorLevels : function(node) {
 			$.ajax({
@@ -61,33 +61,36 @@ Vigu.Toolbar = (function($) {
 		},
 		/**
 		 * Add filter selects
-		 * 
+		 *
 		 * @param {jQuery} node   Node
 		 * @param {array}  levels Levels
-		 * 
-		 * @return {undefiend}
+		 *
+		 * @return {undefined}
 		 */
 		addErrorFilter : function(node, levels) {
+			var label = $('<label class="error-levels">Error level:</label>');
 			var select = $('<select>').attr('name', 'errorLevel').change(function() {
 				Vigu.Grid.parameters.level = $('select[name="errorLevel"]').val();
 				Vigu.Grid.reload();
-			});
-			$('<option>').attr('value', '').text('Error level: All').appendTo(select);
+			}).appendTo(label);
+			$('<option>').attr('value', '').text('All').appendTo(select);
 			for (level in levels) {
-				var text = 'Error level: ' + levels[level].charAt(0).toUpperCase() + levels[level].toLowerCase().slice(1)
+				var text = '' + levels[level].charAt(0).toUpperCase() + levels[level].toLowerCase().slice(1);
+				text = text.replace(' ', '&nbsp;');
 				$('<option>').attr('value', levels[level]).text(text).appendTo(select);
 			}
-			select.appendTo(node).selectmenu({width:160});
+			label.appendTo(node);
+			select.selectmenu();
 		},
 		/**
 		 * Add search field
-		 * 
+		 *
 		 * @param {jQuery} node Node
 		 *
-		 * @return {undefiend}
+		 * @return {undefined}
 		 */
 		addSearch : function(node) {
-			$('<label>')
+			$('<div class="search">')
 				.append($('<span>')
 						.addClass('ui-icon ui-icon-circle-close')
 						.attr('Title', 'Reset search')
@@ -96,7 +99,7 @@ Vigu.Toolbar = (function($) {
 							$('input[name="search"]').val('');
 							Vigu.Grid.reload();
 							$('div[role=toolbar]>label>span').hide();
-						}) 
+						})
 						.hide())
 				.append($('<input type="text">')
 					.attr('name', 'search')

@@ -107,7 +107,7 @@ Vigu.Grid = (function($) {
 						             {name : 'host',      index : 'host',      resizable : false, sortable : false, width : 150,  align: 'center', fixed : true},
 						             {name : 'message',   index : 'message',   classes : 'messageGrid', sortable : false, formatter : Vigu.Grid.messageFormatter},
 						             {name : 'timestamp', index : 'timestamp', resizable : false, width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter},
-						             {name : 'count',     index : 'count',     resizable : false, width : 60,  align: 'center', fixed : true, title : false}
+						             {name : 'count',     index : 'count',     resizable : false, width : 65,  align: 'center', fixed : true, title : false}
 						           ],
 			            jsonReader : {
 			        	      root: "rows",
@@ -160,10 +160,10 @@ Vigu.Grid = (function($) {
 							}
 						}
 					});
-			
+
 			$("#grid").jqGrid('navGrid','#pager',{search:false,edit:false,add:false,del:false});
 			$("#grid").jqGrid('navSeparatorAdd','#pager',{});
-			$("#grid").jqGrid('navButtonAdd','#pager',{caption:"Auto Reload", buttonicon:"none", onClickButton:function(){ 
+			$("#grid").jqGrid('navButtonAdd','#pager',{caption:"Auto Reload", buttonicon:"none", onClickButton:function(){
 				if (!Vigu.Grid.autorefresh) {
 					Vigu.notify("Enabled auto reload");
 					$("#pager_left div:contains('Auto Reload')").addClass('reloadOn');
@@ -173,7 +173,7 @@ Vigu.Grid = (function($) {
 				}
 				Vigu.Grid.autoRefresh();
 			} });
-			
+
 			$(window).bind('resize', function() {
 				$("#grid").setGridWidth(($("[role='application']").width() - 2) / 2, true);
 			}).trigger('resize');
@@ -192,7 +192,7 @@ Vigu.Grid = (function($) {
 		messageFormatter : function(cellvalue, options, rowObject) {
 			if (cellvalue != null) {
 				var newValue = cellvalue.replace(/(href=\W?)/, 'target="ref" $1http://dk.php.net/manual/en/');
-				return newValue;		
+				return newValue;
 			}
 			return '';
 		},
@@ -232,11 +232,11 @@ Vigu.Grid = (function($) {
 				var date = new Date((cellvalue || "").replace(/-/g,"/").replace(/[TZ]/g," "));
 				var diff = (((new Date()).getTime() - date.getTime()) / 1000),
 				day_diff = Math.floor(diff / 86400);
-	
+
 				if (isNaN(day_diff) || day_diff < 0 || day_diff >= 31 ) {
 					return cellvalue;
 				}
-	
+
 				return day_diff == 0 && (
 						diff < 60 && "just now" ||
 						diff < 120 && "1 minute ago" ||

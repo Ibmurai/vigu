@@ -222,7 +222,14 @@ class ApiPublicModelLine extends ApiPublicModel {
 	 * @return array
 	 */
 	public static function getAllLevels() {
+		$redis = self::_getIndexingRedis();
 
+		$levelIndexes = $redis->keys(self::LEVEL_PREFIX . '*');
+		foreach ($levelIndexes as &$level) {
+			$level = substr($level, strlen(self::LEVEL_PREFIX));
+		}
+
+		return $levelIndexes;
 	}
 
 	/**

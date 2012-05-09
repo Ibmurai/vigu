@@ -15,7 +15,7 @@ require_once dirname(__FILE__) . '/../lib/PHP-Daemon/Core/Plugins/Ini.php';
 require_once dirname(__FILE__) . '/RedisFunctions.php';
 require_once dirname(__FILE__) . '/../lib/php-gearman-admin/GearmanAdmin.php';
 /**
- * The Vigu Daemon runs on the server, to process incoming errors.
+ * The Vigu Gearman Daemon runs on the server, to process incoming errors, using workers called "peons".
  *
  * @author Jens Riisom Schultz <ibber_of_crew42@hotmail.com>
  */
