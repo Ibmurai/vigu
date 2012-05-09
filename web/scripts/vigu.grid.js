@@ -190,7 +190,7 @@ Vigu.Grid = (function($) {
 		 */
 		messageFormatter : function(cellvalue, options, rowObject) {
 			if (cellvalue != null) {
-				var newValue = cellvalue.replace(/(href=\W?)/, 'target="ref" $1http://dk.php.net/manual/en/');
+				var newValue = cellvalue.replace(/(href=\W?)/, 'target="ref" $1http://php.net/manual/en/');
 				return newValue;
 			}
 			return '';
