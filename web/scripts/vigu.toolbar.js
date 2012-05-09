@@ -91,40 +91,41 @@ Vigu.Toolbar = (function($) {
 		 */
 		addSearch : function(node) {
 			$('<div class="search">')
-				.append($('<span>')
-						.addClass('ui-icon ui-icon-circle-close')
-						.attr('Title', 'Reset search')
-						.click(function(){
-							Vigu.Grid.parameters.path = '';
-							$('input[name="search"]').val('');
-							Vigu.Grid.reload();
-							$('div[role=toolbar]>label>span').hide();
-						})
-						.hide())
-				.append($('<input type="text">')
-					.attr('name', 'search')
-					.addClass('ui-corner-all')
-					.keypress(function(event) {
-					  if (event.which == 13) {
-						     event.preventDefault();
-						     Vigu.Grid.parameters.path = $('input[name="search"]').val();
-						     Vigu.Grid.reload();
-						   }
-						})
-					.click(function(){
-						 this.select();
-					})
-					.focus(function(){
-						 this.select();
-					})
-					.keydown(function() {
-						if ($('input[name="search"]').val() != '') {
-							$('div[role=toolbar]>label>span').show();
-						} else {
-							$('div[role=toolbar]>label>span').hide();
-						}
-					}))
-				.appendTo(node);
+			.append($('<span>')
+				.addClass('ui-icon ui-icon-circle-close')
+				.attr('Title', 'Reset search')
+				.click(function(){
+					Vigu.Grid.parameters.path = '';
+					$('input[name="search"]').val('');
+					Vigu.Grid.reload();
+					Vigu.Toolbar.updateSearchReset();
+				})
+				.hide())
+			.append($('<input type="text">')
+				.attr('name', 'search')
+				.addClass('ui-corner-all')
+				.keypress(function(event) {
+					if (event.which == 13) {
+						event.preventDefault();
+						Vigu.Grid.parameters.path = $('input[name="search"]').val();
+						Vigu.Grid.reload();
+					}
+				})
+				.keyup(Vigu.Toolbar.updateSearchReset)
+				.change(Vigu.Toolbar.updateSearchReset))
+			.appendTo(node);
+		},
+		/**
+		 * Show or hide the search field reset button depending on content.
+		 *
+		 * @return {undefined}
+		 */
+		updateSearchReset : function() {
+			if ($('input[name="search"]').val() != '') {
+				$('div[role=toolbar]>div>span').show();
+			} else {
+				$('div[role=toolbar]>div>span').hide();
+			}
 		}
 	};
 })(jQuery);
