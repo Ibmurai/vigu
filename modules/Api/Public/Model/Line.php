@@ -33,6 +33,11 @@ class ApiPublicModelLine extends ApiPublicModel {
 	const LEVEL_PREFIX = '|level|';
 
 	/**
+	 * @var string
+	 */
+	const WORD_PREFIX = '|word|';
+
+	/**
 	 * @var Redis
 	 */
 	private static $_storageRedis;
@@ -274,12 +279,17 @@ class ApiPublicModelLine extends ApiPublicModel {
 		$redis = self::_getIndexingRedis();
 
 		if ($path === null) {
+			if ($level !== null) {
+				return $redis->zCard(self::LEVEL_PREFIX . $level);
+			}
+
 			return $redis->zCard(self::COUNTS_PREFIX);
 		} else {
 			$search = self::_splitPath($path);
 			foreach ($search as &$val) {
-				$val = self::COUNTS_PREFIX . strtolower($val);
+				$val = self::WORD_PREFIX . strtolower($val);
 			}
+			$search[] = self::COUNTS_PREFIX;
 
 			$id = uniqid(self::SEARCH_PREFIX, true);
 			$total = $redis->zInter($id, $search);
@@ -330,8 +340,9 @@ class ApiPublicModelLine extends ApiPublicModel {
 		} else {
 			$search = self::_splitPath($path);
 			foreach ($search as &$val) {
-				$val = $prefix . strtolower($val);
+				$val = self::WORD_PREFIX . strtolower($val);
 			}
+			$search[] = $prefix;
 
 			$id = uniqid(self::SEARCH_PREFIX, true);
 			$redis->zInter($id, $search);

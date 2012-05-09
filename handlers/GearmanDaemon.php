@@ -38,8 +38,8 @@ class ViguGearmanDaemon extends Core_Daemon {
 	 * @return null
 	 */
 	protected function __construct() {
-		// We want to our daemon to tick once every 5 seconds.
-		$this->loop_interval = 5.00;
+		// We want to our daemon to tick once every 2 seconds.
+		$this->loop_interval = 2.00;
 
 		// Set our Lock Provider
 		$this->lock = new Core_Lock_File();
@@ -119,7 +119,7 @@ class ViguGearmanDaemon extends Core_Daemon {
 	 * @return null
 	 */
 	protected function execute() {
-		if ($this->_ticks++ % 60 == 0) {
+		if ($this->_ticks++ % 150 == 0) {
 			$this->_cleanupAndCheckWorkers();
 		}
 

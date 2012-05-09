@@ -22,6 +22,9 @@ class RedisFunctions {
 	/** @var string The prefix to use for temporary indexes. */
 	const SEARCH_PREFIX = '|search|';
 
+	/** @var string The prefix to use for word indexes. */
+	const WORD_PREFIX = '|word|';
+
 	/** @var string The Redis host. */
 	private $_host;
 
@@ -190,10 +193,11 @@ class RedisFunctions {
 	public function index($hash, $timestamp, array $line) {
 		$this->_readys(2);
 
-		$count = $this->_redis->zIncrBy(self::COUNTS_PREFIX, 1, $hash);
 		$oldLastTimestamp = $this->_redis->zScore(self::TIMESTAMPS_PREFIX, $hash);
 
 		$this->_redis->multi(Redis::PIPELINE);
+
+		$this->_redis->zIncrBy(self::COUNTS_PREFIX, 1, $hash);
 
 		if ($timestamp > $oldLastTimestamp) {
 			$this->_redis->zAdd(self::TIMESTAMPS_PREFIX, $timestamp, $hash);
@@ -201,8 +205,7 @@ class RedisFunctions {
 			$timestamp = $oldLastTimestamp;
 		}
 		foreach ($this->splitPath($line['file']) as $word) {
-			$this->_redis->zAdd(self::TIMESTAMPS_PREFIX . strtolower($word), $timestamp, $hash);
-			$this->_redis->zAdd(self::COUNTS_PREFIX . strtolower($word), $count, $hash);
+			$this->_redis->zAdd(self::WORD_PREFIX . strtolower($word), 1.0, $hash);
 		}
 		$this->_redis->zAdd(self::LEVEL_PREFIX . $line['level'], 1.0, $hash);
 
@@ -256,6 +259,17 @@ class RedisFunctions {
 		$this->_readys(3);
 
 		return $this->_redis->lSize('incoming');
+	}
+
+	/**
+	 * Flush all the DB's. Only used for testing.
+	 *
+	 * @return boolean Always true.
+	 */
+	public function flushAll() {
+		$this->_readys(0);
+
+		return $this->_redis->flushAll();
 	}
 
 	/**
