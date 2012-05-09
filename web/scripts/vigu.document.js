@@ -53,6 +53,25 @@ Vigu.Document = (function($) {
 				}
 			},
 			/**
+			 * Set the handled status for an error
+			 *
+			 * @param {boolean} handled Has this error been handled
+			 * @param {string}  key     The key of the error
+			 *
+			 * @return undefined
+			 */
+			setHandled : function(handled, key) {
+				var url = handled ? '/api/log/handle' : '/api/log/un_handle';
+				$.ajax({
+					url : url,
+					dataType : 'json',
+					data: { key: key },
+					error : function() {
+						Vigu.notify('Setting the handled status failed');
+					}
+				});
+			},
+			/**
 			 * Set the size of the document in the interface
 			 *
 			 * @return {undefined}
@@ -73,7 +92,29 @@ Vigu.Document = (function($) {
 			headerSection : function(node, data) {
 				var title = data.level;
 				var level = data.level.toLowerCase().replace(' error', '_error').replace(' warning', '_warning').replace(' notice', '_notice');
-				$('<div>').addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle').append($('<span>').text(title).attr('title', title)).appendTo(node);
+				$('<div>')
+					.addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle')
+					.append($('<label>')
+							.text('Handled').append($('<input type="checkbox">')
+								.change(function(){
+									if ($(this).is(':checked')) {
+										Vigu.notify('Error marked as handled');
+										Vigu.Document.setHandled(true, data.key);
+										if (!Vigu.Grid.parameters.handled) {
+											Vigu.Grid.reload();
+										}
+									} else {
+										Vigu.notify('Error unmarked as handled');
+										Vigu.Document.setHandled(false, data.key);
+										if (!Vigu.Grid.parameters.handled) {
+											Vigu.Grid.reload();
+										}
+									}
+								})))
+					.append($('<span>')
+						.text(title)
+						.attr('title', title))
+					.appendTo(node);
 				var left = $('<div>').addClass('icons').appendTo(node);
 				var right = $('<div>').addClass('fields').appendTo(node);
 				$('<div>').addClass(level).addClass('errorLevel').appendTo(left);
