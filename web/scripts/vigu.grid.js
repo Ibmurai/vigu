@@ -132,7 +132,6 @@ Vigu.Grid = (function($) {
 						viewrecords : true,
 						sortorder : "desc",
 						autowidth: true,
-						viewrecords: true,
 						gridview: true,
 						hidegrid: false,
 						height: gridHeight,

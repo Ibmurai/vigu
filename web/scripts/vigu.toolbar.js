@@ -80,7 +80,7 @@ Vigu.Toolbar = (function($) {
 				$('<option>').attr('value', levels[level]).text(text).appendTo(select);
 			}
 			label.appendTo(node);
-			select.selectmenu();
+			select.selectmenu({format : Vigu.Grid.levelFormatter});
 		},
 		/**
 		 * Add search field

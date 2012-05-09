@@ -14,18 +14,18 @@ div.strict            {	background-image: url(/images/strict.png); }
 div.notice            { background-image: url(/images/notice.png); }
 div.user_notice       { background-image: url(/images/notice.png); }
 
-td[role=gridcell] span.errorlevel_parse             { color: MediumVioletRed; font-weight: bold; }
-td[role=gridcell] span.errorlevel_compile_error     { color: FireBrick; font-weight: bold; }
-td[role=gridcell] span.errorlevel_compile_warning   { color: Sienna; font-weight: bold; }
-td[role=gridcell] span.errorlevel_core_error        { color: OrangeRed; font-weight: bold; }
-td[role=gridcell] span.errorlevel_core_warning      { color: DarkGoldenRod; font-weight: bold; }
-td[role=gridcell] span.errorlevel_recoverable_error { color: red; }
-td[role=gridcell] span.errorlevel_error             { color: red; }
-td[role=gridcell] span.errorlevel_user_error        { font-style: italic; color: red; }
-td[role=gridcell] span.errorlevel_warning           { color: maroon; }
-td[role=gridcell] span.errorlevel_user_warning      { font-style: italic; color: maroon; }
-td[role=gridcell] span.errorlevel_notice            { color: CornflowerBlue ; }
-td[role=gridcell] span.errorlevel_user_notice       { font-style: italic; color: CornflowerBlue ;}
-td[role=gridcell] span.errorlevel_strict            { color: black; }
-td[role=gridcell] span.errorlevel_deprecated        { color: Orange ; }
-td[role=gridcell] span.errorlevel_user_deprecated   { font-style: italic; color: Orange; }
+span.errorlevel_parse             { color: MediumVioletRed; font-weight: bold; }
+span.errorlevel_compile_error     { color: FireBrick; font-weight: bold; }
+span.errorlevel_compile_warning   { color: Sienna; font-weight: bold; }
+span.errorlevel_core_error        { color: OrangeRed; font-weight: bold; }
+span.errorlevel_core_warning      { color: DarkGoldenRod; font-weight: bold; }
+span.errorlevel_recoverable_error { color: red; }
+span.errorlevel_error             { color: red; }
+span.errorlevel_user_error        { font-style: italic; color: red; }
+span.errorlevel_warning           { color: maroon; }
+span.errorlevel_user_warning      { font-style: italic; color: maroon; }
+span.errorlevel_notice            { color: CornflowerBlue ; }
+span.errorlevel_user_notice       { font-style: italic; color: CornflowerBlue ;}
+span.errorlevel_strict            { color: black; }
+span.errorlevel_deprecated        { color: Orange ; }
+span.errorlevel_user_deprecated   { font-style: italic; color: Orange; }
