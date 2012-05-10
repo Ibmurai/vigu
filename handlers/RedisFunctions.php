@@ -113,10 +113,11 @@ class RedisFunctions {
 	 *
 	 * @param string  $hash
 	 * @param integer $timestamp
+	 * @param integer $count     The number of times the error was triggered.
 	 *
 	 * @return null
 	 */
-	public function process($hash, $timestamp) {
+	public function process($hash, $timestamp, $count) {
 		$this->_readys(3);
 
 		if (($line = $this->_redis->get($hash)) === false) {
@@ -125,7 +126,7 @@ class RedisFunctions {
 		$this->_redis->expire($hash, 60);
 
 		$line = $this->store($hash, $timestamp, $line);
-		$this->index($hash, $timestamp, $line);
+		$this->index($hash, $timestamp, $line, $count);
 	}
 
 	/**
@@ -135,8 +136,8 @@ class RedisFunctions {
 	 */
 	public function processMultiple(array $hashAndTimestamps) {
 		foreach ($hashAndTimestamps as $hashAndTimestamp) {
-			list($hash, $timestamp) = $hashAndTimestamp;
-			$this->process($hash, $timestamp);
+			list($hash, $timestamp, $count) = $hashAndTimestamp;
+			$this->process($hash, $timestamp, $count);
 		}
 	}
 
@@ -187,17 +188,18 @@ class RedisFunctions {
 	 * @param string  $hash
 	 * @param integer $timestamp
 	 * @param array   $line
+	 * @param integer $count     The number of times the error was triggered.
 	 *
 	 * @return null
 	 */
-	public function index($hash, $timestamp, array $line) {
+	public function index($hash, $timestamp, array $line, $count) {
 		$this->_readys(2);
 
 		$oldLastTimestamp = $this->_redis->zScore(self::TIMESTAMPS_PREFIX, $hash);
 
 		$this->_redis->multi(Redis::PIPELINE);
 
-		$this->_redis->zIncrBy(self::COUNTS_PREFIX, 1, $hash);
+		$this->_redis->zIncrBy(self::COUNTS_PREFIX, $count, $hash);
 
 		if ($timestamp > $oldLastTimestamp) {
 			$this->_redis->zAdd(self::TIMESTAMPS_PREFIX, $timestamp, $hash);
@@ -238,7 +240,7 @@ class RedisFunctions {
 	 *
 	 * @param integer $limit The maximum number of incoming elements to retrieve.
 	 *
-	 * @return array An array of [string key, integer timestamp].
+	 * @return array An array of [string key, integer timestamp, integer count].
 	 */
 	public function getIncoming($limit = 1000) {
 		$this->_readys(3);

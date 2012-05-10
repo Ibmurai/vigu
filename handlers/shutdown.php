@@ -54,6 +54,13 @@ class ViguErrorHandler {
 	private static $_host;
 
 	/**
+	 * The last logged key.
+	 *
+	 * @var string
+	 */
+	private static $_lastLoggedKey;
+
+	/**
 	 * Read and parse vigu.ini.
 	 *
 	 * @return boolean True on success, false on failure.
@@ -200,22 +207,31 @@ class ViguErrorHandler {
 	 * @return void
 	 */
 	private static function _logError($errno, $message, $file, $line, $context = array(), $stacktrace = array()) {
-		array_shift($stacktrace);
+		$level = is_string($errno) ? $errno : self::_errnoToString($errno);
+		$host = self::_getHost();
 
-		self::$_log[] = array(
-			'host'       => self::_getHost(),
-			'timestamp'  => time(),
-			'level'      => is_string($errno) ? $errno : self::_errnoToString($errno),
-			'message'    => $message,
-			'file'       => $file,
-			'line'       => $line,
-			'context'    => self::_cleanContext($context),
-			'stacktrace' => self::_cleanStacktrace($stacktrace),
-		);
+		$key = md5($level . self::_getHost() . $file . $line . $message);
 
-		if (count(self::$_log) >= 101) {
-			self::_send();
+		if (!isset(self::$_log[$key])) {
+			array_shift($stacktrace);
+			self::$_log[$key] = array(
+				'host'       => $host,
+				'level'      => $level,
+				'message'    => $message,
+				'file'       => $file,
+				'line'       => $line,
+				'context'    => self::_cleanContext($context),
+				'stacktrace' => self::_cleanStacktrace($stacktrace),
+				'count'      => 1,
+			);
+
+			if (count(self::$_log) >= 100) {
+				self::_send();
+			}
+		} else {
+			self::$_log[$key]['count']++;
 		}
+		self::$_lastLoggedKey = $key;
 	}
 
 	/**
@@ -225,7 +241,7 @@ class ViguErrorHandler {
 	 */
 	private static function _getLastLoggedError() {
 		if (!empty(self::$_log)) {
-			return self::$_log[count(self::$_log) - 1];
+			return self::$_log[self::$_lastLoggedKey];
 		} else {
 			return null;
 		}
@@ -333,16 +349,15 @@ class ViguErrorHandler {
 			if (class_exists('Redis')) {
 				$redis = new Redis();
 				try {
-					if ($redis->connect(self::$_redisConnectionData['host'], self::$_redisConnectionData['port'], self::$_redisConnectionData['timeout'])) {
+					if ($redis->pconnect(self::$_redisConnectionData['host'], self::$_redisConnectionData['port'], self::$_redisConnectionData['timeout'])) {
 						$redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
 						$redis->select(3);
-
+						$time = time();
 						$redis->multi(Redis::PIPELINE);
-						foreach (self::$_log as $line) {
-							$md5 = md5($line['level'] . $line['host'] . $line['file'] . $line['line'] . $line['message']);
-							$redis->rPush('incoming', array($md5, $line['timestamp']));
-							unset($line['timestamp']);
-							$redis->setnx($md5, $line);
+						foreach (self::$_log as $md5 => $line) {
+							$redis->rPush('incoming', array($md5, $time, $line['count']));
+							unset($line['count']);
+							$redis->set($md5, $line);
 						}
 						$redis->exec();
 						$redis->close();

@@ -56,8 +56,8 @@ function incoming(GearmanJob $job) {
 	msg('Processing ' . count($data) . ' items.');
 
 	foreach ($data as $inc) {
-		list($hash, $timestamp) = $inc;
-		$redis->process($hash, $timestamp);
+		list($hash, $timestamp, $count) = $inc;
+		$redis->process($hash, $timestamp, $count);
 	}
 
 	msg(sprintf('Work complete! (%.3f s)', microtime(true) - $start));
