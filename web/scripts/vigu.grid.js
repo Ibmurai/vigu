@@ -32,10 +32,10 @@ Vigu.Grid = (function($) {
 		 */
 		parameters : {
 			/**
-			 * Module to limit search by
+			 * Limit the seach to handled errors
 			 * @type {String}
 			 */
-			module : '',
+			handled : false,
 			/**
 			 * Host to limit search by
 			 * @type {String}
@@ -145,6 +145,7 @@ Vigu.Grid = (function($) {
 						gridComplete: function() {
 							if (!Vigu.Grid.autorefresh) {
 								var firstIdOnPage = $("[role='grid']").getDataIDs()[0];
+								$("#grid").setSelection (firstIdOnPage, true);
 								$('.ui-grid-ico-sort.ui-icon-desc.ui-sort-ltr').hide();
 								if (firstIdOnPage != '') {
 									Vigu.Document.render(Vigu.rightColumn, firstIdOnPage);

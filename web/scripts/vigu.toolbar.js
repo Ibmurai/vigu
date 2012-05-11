@@ -28,6 +28,7 @@ Vigu.Toolbar = (function($) {
 			toolbar.appendTo(node);
 			this.addSearch(toolbar);
 			this.getErrorLevels(toolbar);
+			this.addHandled(toolbar);
 		},
 		/**
 		 * Render the toolbar
@@ -69,7 +70,7 @@ Vigu.Toolbar = (function($) {
 		 */
 		addErrorFilter : function(node, levels) {
 			node.find('label.error-levels').remove();
-			var label = $('<label class="error-levels">Error level:</label>');
+			var label = $('<label>').text('Error level:').addClass('error-levels');
 			var select = $('<select>').attr('name', 'errorLevel').change(function() {
 				Vigu.Grid.parameters.level = $('select[name="errorLevel"]').val();
 				Vigu.Grid.reload();
@@ -91,7 +92,8 @@ Vigu.Toolbar = (function($) {
 		 * @return {undefined}
 		 */
 		addSearch : function(node) {
-			$('<div class="search">')
+			$('<div>')
+			.addClass('search')
 			.append($('<span>')
 				.addClass('ui-icon ui-icon-circle-close')
 				.attr('Title', 'Reset search')
@@ -115,6 +117,28 @@ Vigu.Toolbar = (function($) {
 				.keyup(Vigu.Toolbar.updateSearchReset)
 				.change(Vigu.Toolbar.updateSearchReset))
 			.appendTo(node);
+		},
+		/**
+		 * Add handled selection
+		 *
+		 * @param {jQuery} node Node
+		 *
+		 * @return {undefined}
+		 */
+		addHandled : function(node) {
+			$('<label>')
+				.text('Show handled errors')
+				.append($('<input type="checkbox">')
+						.change(function() {
+							if ($(this).is(':checked')) {
+								Vigu.Grid.parameters.handled = true;
+								Vigu.Grid.reload();
+							} else {
+								Vigu.Grid.parameters.handled = false;
+								Vigu.Grid.reload();
+							}
+						}))
+				.appendTo(node);
 		},
 		/**
 		 * Show or hide the search field reset button depending on content.

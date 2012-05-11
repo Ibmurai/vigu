@@ -104,6 +104,8 @@ class ApiPublicControllerLog extends ApiPublicController {
 				'stacktrace' => $line->getStacktrace(),
 				'count'      => $count = $line->getCount(),
 				'frequency'  => ($count / (max(1, time() - $timestampMin))) * 3600,
+				'handled'    => false,
+				'key'		 => $key,
 			)
 		);
 	}
@@ -135,7 +137,7 @@ class ApiPublicControllerLog extends ApiPublicController {
 	/**
 	 * Unmark a previously handled error.
 	 *
-	 * @param type $key The key of the error to unmark.
+	 * @param string $key The key of the error to unmark.
 	 */
 	public function unHandleAction($key) {
 		try {
