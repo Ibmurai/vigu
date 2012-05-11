@@ -104,7 +104,7 @@ class ApiPublicControllerLog extends ApiPublicController {
 				'stacktrace' => $line->getStacktrace(),
 				'count'      => $count = $line->getCount(),
 				'frequency'  => ($count / (max(1, time() - $timestampMin))) * 3600,
-				'handled'    => false,
+				'handled'    => $line->isHandled(),
 				'key'		 => $key,
 			)
 		);
@@ -145,7 +145,7 @@ class ApiPublicControllerLog extends ApiPublicController {
 		} catch (RuntimeException $e) {
 			$this->assign('error', get_class($e) . ': ' . $e->getMessage());
 		}
-		
+
 		$line->unhandle();
 	}
 }

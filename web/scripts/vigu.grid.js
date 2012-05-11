@@ -76,6 +76,7 @@ Vigu.Grid = (function($) {
 		reload : function() {
 			$("#grid").jqGrid().setGridParam({page : 1});
 			$("#grid").jqGrid().setGridParam({url : '/api/log/grid' + Vigu.Grid.queryString()}).trigger("reloadGrid");
+
 			Vigu.Toolbar.getErrorLevels($('div[role=toolbar]'));
 		},
 		/**
@@ -104,7 +105,7 @@ Vigu.Grid = (function($) {
 						datatype : "json",
 						colNames : [ 'Level', 'Host', 'Message', 'Last', 'Count'],
 						colModel : [
-						             {name : 'level',     index : 'level',     resizable : false, sortable : false, width : 120,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.levelFormatter},
+						             {name : 'level',     index : 'level',     resizable : false, sortable : false, width : 120,  align: 'center', fixed : true, formatter : Vigu.Grid.levelFormatter},
 						             {name : 'host',      index : 'host',      resizable : false, sortable : false, width : 150,  align: 'center', fixed : true},
 						             {name : 'message',   index : 'message',   classes : 'messageGrid', sortable : false, formatter : Vigu.Grid.messageFormatter},
 						             {name : 'timestamp', index : 'timestamp', resizable : false, width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter},
@@ -162,7 +163,10 @@ Vigu.Grid = (function($) {
 						}
 					});
 
-			$("#grid").jqGrid('navGrid','#pager',{search:false,edit:false,add:false,del:false});
+			$("#grid").jqGrid('navGrid','#pager',{search:false,edit:false,add:false,del:false,refresh:false});
+			$("#grid").jqGrid('navButtonAdd','#pager',{caption:"", buttonicon:"ui-icon-refresh", onClickButton:function(){
+				Vigu.Grid.reload();
+			}});
 			$("#grid").jqGrid('navSeparatorAdd','#pager',{});
 			$("#grid").jqGrid('navButtonAdd','#pager',{caption:"Auto Reload", buttonicon:"none", onClickButton:function(){
 				if (!Vigu.Grid.autorefresh) {
@@ -173,12 +177,11 @@ Vigu.Grid = (function($) {
 					Vigu.notify("Disabled auto reload");
 				}
 				Vigu.Grid.autoRefresh();
-			} });
+			}});
 
 			$(window).bind('resize', function() {
 				$("#grid").setGridWidth(($("[role='application']").width() - 2) / 2, true);
 			}).trigger('resize');
-
 		},
 		/**
 		 * Formats the message

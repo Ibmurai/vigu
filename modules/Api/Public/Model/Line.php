@@ -267,14 +267,15 @@ class ApiPublicModelLine extends ApiPublicModel {
 	 *
 	 * @param integer $offset
 	 * @param integer $limit
-	 * @param string  $path   An optional path search string.
-	 * @param string  $level  An optional error level to filter by.
+	 * @param string  $path    An optional path search string.
+	 * @param string  $level   An optional error level to filter by.
+	 * @param boolean $handled Get handled errors?
 	 *
 	 * @return ApiPublicModelLine[]
 	 * @throws RuntimeException if failing to create a new ApiPublicModelLine
 	 */
-	public static function getMostRecent($offset, $limit, $path = null, $level = null) {
-		return self::_getByPrefix(self::TIMESTAMPS_PREFIX, $offset, $limit, $path, $level);
+	public static function getMostRecent($offset, $limit, $path = null, $level = null, $handled = false) {
+		return self::_getByPrefix(self::TIMESTAMPS_PREFIX, $offset, $limit, $path, $level, $handled);
 	}
 
 	/**
@@ -282,109 +283,103 @@ class ApiPublicModelLine extends ApiPublicModel {
 	 *
 	 * @param integer $offset
 	 * @param integer $limit
-	 * @param string  $path   An optional path search string.
-	 * @param string  $level  An optional error level to filter by.
+	 * @param string  $path    An optional path search string.
+	 * @param string  $level   An optional error level to filter by.
+	 * @param boolean $handled Get handled errors?
 	 *
 	 * @return ApiPublicModelLine[]
 	 * @throws RuntimeException if failing to create a new ApiPublicModelLine
 	 */
-	public static function getMostTriggered($offset, $limit, $path = null, $level = null) {
-		return self::_getByPrefix(self::COUNTS_PREFIX, $offset, $limit, $path, $level);
+	public static function getMostTriggered($offset, $limit, $path = null, $level = null, $handled = false) {
+		return self::_getByPrefix(self::COUNTS_PREFIX, $offset, $limit, $path, $level, $handled);
 	}
 
 	/**
 	 * Get the total number of lines.
 	 *
-	 * @param string $path  An optional path search string.
-	 * @param string $level An optional error level to filter by.
+	 * @param string  $path  An optional path search string.
+	 * @param string  $level An optional error level to filter by.
+	 * @param boolean $handled Get handled errors?
 	 *
 	 * @return integer
 	 */
-	public static function getTotal($path = null, $level = null) {
+	public static function getTotal($path = null, $level = null, $handled = false) {
 		$redis = self::_getIndexingRedis();
 
-		if ($path === null) {
-			if ($level !== null) {
-				return $redis->zCard(self::LEVEL_PREFIX . $level);
+		$id = uniqid(self::SEARCH_PREFIX, true);
+
+		$zinters = array(self::COUNTS_PREFIX);
+
+		if ($path !== null) {
+			foreach (self::_splitPath($path) as $val) {
+				$zinters[] = self::WORD_PREFIX . strtolower($val);
 			}
-
-			return $redis->zCard(self::COUNTS_PREFIX);
-		} else {
-			$search = self::_splitPath($path);
-			foreach ($search as &$val) {
-				$val = self::WORD_PREFIX . strtolower($val);
-			}
-			$search[] = self::COUNTS_PREFIX;
-
-			$id = uniqid(self::SEARCH_PREFIX, true);
-			$total = $redis->zInter($id, $search);
-
-			if ($level !== null) {
-				$oldId = $id;
-				$id = uniqid(self::SEARCH_PREFIX, true);
-				$total = $redis->zInter($id, array($oldId, self::LEVEL_PREFIX . $level));
-				$redis->del($oldId);
-			}
-
-			$redis->del($id);
-
-			return $total;
 		}
+
+		if ($level !== null) {
+			$zinters[] = self::LEVEL_PREFIX . $level;
+		}
+
+		$redis->zInter($id, $zinters);
+
+		if ($handled == false) {
+			foreach ($redis->zRange(self::HANDLED_INDEX, 0, -1) as $hash) {
+				$redis->zRem($id, $hash);
+			}
+		}
+
+		$total = $redis->zCard($id);
+		
+		$redis->del($id);
+
+		return $total;
 	}
 
 	/**
 	 * Get lines ordered by timestamp or count, descending.
 	 *
-	 * @param string  $prefix The index prefix.
+	 * @param string  $prefix  The index prefix.
 	 * @param integer $offset
 	 * @param integer $limit
-	 * @param string  $path   An optional path search string.
-	 * @param string  $level  An optional error level to filter by.
+	 * @param string  $path    An optional path search string.
+	 * @param string  $level   An optional error level to filter by.
+	 * @param boolean $handled Get handled errors?
 	 *
 	 * @return ApiPublicModelLine[]
 	 */
-	private static function _getByPrefix($prefix, $offset, $limit, $path = null, $level = null) {
+	private static function _getByPrefix($prefix, $offset, $limit, $path = null, $level = null, $handled = false) {
 		$redis = self::_getIndexingRedis();
 		$start = $offset;
 		$end   = $start + ($limit - 1);
 
-		$result = array();
-		if ($path === null && $level === null) {
-			foreach ($redis->zRevRange($prefix, $start, $end) as $key) {
-				$result[] = new ApiPublicModelLine($key);
+		$id = uniqid(self::SEARCH_PREFIX, true);
+
+		$zinters = array($prefix);
+
+		if ($path !== null) {
+			foreach (self::_splitPath($path) as $val) {
+				$zinters[] = self::WORD_PREFIX . strtolower($val);
 			}
-		} else if ($path === null) {
-			$id = uniqid(self::SEARCH_PREFIX, true);
-			$redis->zInter($id, array($prefix, self::LEVEL_PREFIX . $level));
-
-			foreach ($redis->zRevRange($id, $start, $end) as $key) {
-				$result[] = new ApiPublicModelLine($key);
-			}
-
-			$redis->del($id);
-		} else {
-			$search = self::_splitPath($path);
-			foreach ($search as &$val) {
-				$val = self::WORD_PREFIX . strtolower($val);
-			}
-			$search[] = $prefix;
-
-			$id = uniqid(self::SEARCH_PREFIX, true);
-			$redis->zInter($id, $search);
-
-			if ($level !== null) {
-				$oldId = $id;
-				$id = uniqid(self::SEARCH_PREFIX, true);
-				$redis->zInter($id, array($oldId, self::LEVEL_PREFIX . $level));
-				$redis->del($oldId);
-			}
-
-			foreach ($redis->zRevRange($id, $start, $end) as $key) {
-				$result[] = new ApiPublicModelLine($key);
-			}
-
-			$redis->del($id);
 		}
+
+		if ($level !== null) {
+			$zinters[] = self::LEVEL_PREFIX . $level;
+		}
+
+		$redis->zInter($id, $zinters);
+
+		if ($handled == false) {
+			foreach ($redis->zRange(self::HANDLED_INDEX, 0, -1) as $hash) {
+				$redis->zRem($id, $hash);
+			}
+		}
+
+		$result = array();
+		foreach ($redis->zRevRange($id, $start, $end) as $key) {
+			$result[] = new ApiPublicModelLine($key);
+		}
+
+		$redis->del($id);
 
 		return $result;
 	}

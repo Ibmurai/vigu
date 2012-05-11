@@ -69,6 +69,7 @@ Vigu.Toolbar = (function($) {
 		 * @return {undefined}
 		 */
 		addErrorFilter : function(node, levels) {
+			var previousValue = node.find('label.error-levels select').val();
 			node.find('label.error-levels').remove();
 			var label = $('<label>').text('Error level:').addClass('error-levels');
 			var select = $('<select>').attr('name', 'errorLevel').change(function() {
@@ -83,6 +84,9 @@ Vigu.Toolbar = (function($) {
 			}
 			label.appendTo(node);
 			select.selectmenu({format : Vigu.Grid.levelFormatter});
+			if (previousValue != undefined) {
+				select.selectmenu('value', previousValue);
+			}
 		},
 		/**
 		 * Add search field
