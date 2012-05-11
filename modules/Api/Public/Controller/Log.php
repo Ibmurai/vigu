@@ -33,16 +33,16 @@ class ApiPublicControllerLog extends ApiPublicController {
 		try {
 			switch (true) {
 				case $sidx == 'timestamp':
-					$lines = ApiPublicModelLine::getMostRecent($offset, $limit, $path, $level);
+					$lines = ApiPublicModelLine::getMostRecent($offset, $limit, $path, $level, $handled);
 					break;
 				case $sidx == 'count':
-					$lines = ApiPublicModelLine::getMostTriggered($offset, $limit, $path, $level);
+					$lines = ApiPublicModelLine::getMostTriggered($offset, $limit, $path, $level, $handled);
 					break;
 				default:
 					throw new RuntimeException("You cannot order by $sidx.");
 			}
 
-			$total = ApiPublicModelLine::getTotal($path, $level);
+			$total = ApiPublicModelLine::getTotal($path, $level, $handled);
 		} catch (RuntimeException $ex) {
 			$this->assign('error', $ex->getMessage());
 			return;
@@ -123,7 +123,13 @@ class ApiPublicControllerLog extends ApiPublicController {
 	 * @param string $key The key of the error to mark.
 	 */
 	public function handleAction($key) {
-		$this->doOutputDisabled();
+		try {
+			$line = new ApiPublicModelLine($key);
+		} catch (RuntimeException $e) {
+			$this->assign('error', get_class($e) . ': ' . $e->getMessage());
+		}
+
+		$line->handle();
 	}
 
 	/**
@@ -132,6 +138,12 @@ class ApiPublicControllerLog extends ApiPublicController {
 	 * @param type $key The key of the error to unmark.
 	 */
 	public function unHandleAction($key) {
-		$this->doOutputDisabled();
+		try {
+			$line = new ApiPublicModelLine($key);
+		} catch (RuntimeException $e) {
+			$this->assign('error', get_class($e) . ': ' . $e->getMessage());
+		}
+		
+		$line->unhandle();
 	}
 }

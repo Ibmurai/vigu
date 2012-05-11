@@ -38,6 +38,13 @@ class ApiPublicModelLine extends ApiPublicModel {
 	const WORD_PREFIX = '|word|';
 
 	/**
+	 * The name of the list of handled keys.
+	 *
+	 * @var string
+	 */
+	const HANDLED_INDEX = '|handled|';
+
+	/**
 	 * @var Redis
 	 */
 	private static $_storageRedis;
@@ -96,6 +103,11 @@ class ApiPublicModelLine extends ApiPublicModel {
 	 * @var integer
 	 */
 	private $_count;
+
+	/**
+	 * @var boolean
+	 */
+	private $_isHandled;
 
 	/**
 	 * Get an existing Line, by key.
@@ -219,6 +231,19 @@ class ApiPublicModelLine extends ApiPublicModel {
 	 */
 	public function getStacktrace() {
 		return $this->_stacktrace;
+	}
+
+	/**
+	 * Get whether or not this line is handled.
+	 *
+	 * @return boolean True if the line is handled.
+	 */
+	public function isHandled() {
+		if (!isset($this->_isHandled)) {
+			$redis = self::_getIndexingRedis();
+			$this->_isHandled = $redis->zScore(self::HANDLED_INDEX, $this->getKey()) == 1.0;
+		}
+		return $this->_isHandled;
 	}
 
 	/**
@@ -362,6 +387,33 @@ class ApiPublicModelLine extends ApiPublicModel {
 		}
 
 		return $result;
+	}
+
+
+	/**
+	 * Mark the line as handled.
+	 *
+	 * @return null
+	 */
+	public function handle() {
+		$redis = self::_getIndexingRedis();
+
+		$redis->zAdd(self::HANDLED_INDEX, 1.0, $this->getKey());
+
+		$this->_isHandled = true;
+	}
+
+	/**
+	 * Unmark the line as handled.
+	 *
+	 * @return null
+	 */
+	public function unhandle() {
+		$redis = self::_getIndexingRedis();
+
+		$redis->zRem(self::HANDLED_INDEX, $this->getKey());
+
+		$this->_isHandled = false;
 	}
 
 	/**
