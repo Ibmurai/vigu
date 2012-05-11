@@ -82,7 +82,7 @@ Vigu.Document = (function($) {
 				$('<dt>').text('Last (First)').appendTo(dl);
 				$('<dd>').text(data.last + ' (' + data.first + ')').attr('title', data.last + '' + data.first + ')').appendTo(dl);
 				$('<dt>').text('Frequency').appendTo(dl);
-				$('<dd>').text(data.frequency.toPrecision(2)).attr('title', data.frequency).appendTo(dl);
+				$('<dd>').text(data.frequency.toFixed(1) + ' per hour').attr('title', data.frequency).appendTo(dl);
 				$('<dt>').text('File').appendTo(dl);
 				$('<dd>').text(data.file).addClass('file_search').attr('title', data.file).click(function(){
 				    Vigu.Grid.parameters.path = data.file;

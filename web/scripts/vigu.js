@@ -15,33 +15,33 @@ Vigu = (function($) {
 		return {
 			/**
 			 * The main application
-			 * 
+			 *
 			 * @type jQuery node
 			 */
 			application : undefined,
 			/**
 			 * The left column
-			 * 
+			 *
 			 * @type jQuery node
 			 */
 			leftColumn : undefined,
 			/**
 			 * The right column
-			 * 
+			 *
 			 * @type jQuery node
 			 */
 			rightColumn : undefined,
 			/**
 			 * Create the vigu application
-			 * 
+			 *
 			 * @return undefined
 			 */
 			setup : function() {
 				this.application = $('<div>').attr('role', 'application');
 				this.leftColumn  = $('<div>').attr('role', 'region');
 				this.rightColumn = $('<div>').attr('role', 'region');
-				
-				Vigu.Toolbar.setup(this.application, 'Vigu - You did this!');
+
+				Vigu.Toolbar.setup(this.application, 'Vigu');
 				this.application.append(this.leftColumn);
 				this.application.append(this.rightColumn);
 				Vigu.Grid.setup(this.leftColumn);
@@ -49,9 +49,9 @@ Vigu = (function($) {
 			},
 			/**
 			 * Render the UI
-			 * 
+			 *
 			 * This needs to be done after the elements have been added to the DOM
-			 * 
+			 *
 			 * @return undefined
 			 */
 			render : function() {
@@ -60,9 +60,9 @@ Vigu = (function($) {
 			},
 			/**
 			 * Notify the user about something
-			 * 
+			 *
 			 * @param {string} message Message to user
-			 * 
+			 *
 			 * @return void
 			 */
 			notify : function(message) {

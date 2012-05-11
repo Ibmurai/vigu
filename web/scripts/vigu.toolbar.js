@@ -55,7 +55,7 @@ Vigu.Toolbar = (function($) {
 					}
 				},
 				error : function() {
-					Vigu.notify('Could not retrive error levels');
+					Vigu.notify('Could not retrieve error levels');
 				}
 			});
 		},
@@ -68,6 +68,7 @@ Vigu.Toolbar = (function($) {
 		 * @return {undefined}
 		 */
 		addErrorFilter : function(node, levels) {
+			node.find('label.error-levels').remove();
 			var label = $('<label class="error-levels">Error level:</label>');
 			var select = $('<select>').attr('name', 'errorLevel').change(function() {
 				Vigu.Grid.parameters.level = $('select[name="errorLevel"]').val();
