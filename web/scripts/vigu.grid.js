@@ -103,13 +103,14 @@ Vigu.Grid = (function($) {
 					{
 						url : '/api/log/grid' + Vigu.Grid.queryString(),
 						datatype : "json",
-						colNames : [ 'Level', 'Host', 'Message', 'Last', 'Count'],
+						colNames : [ 'Level', 'Host', 'Message', 'Last', 'Count', ''],
 						colModel : [
 						             {name : 'level',     index : 'level',     resizable : false, sortable : false, width : 120,  align: 'center', fixed : true, formatter : Vigu.Grid.levelFormatter},
 						             {name : 'host',      index : 'host',      resizable : false, sortable : false, width : 150,  align: 'center', fixed : true},
 						             {name : 'message',   index : 'message',   classes : 'messageGrid', sortable : false, formatter : Vigu.Grid.messageFormatter},
 						             {name : 'timestamp', index : 'timestamp', resizable : false, width : 140, align: 'center', fixed : true, title : false, formatter : Vigu.Grid.agoFormatter},
-						             {name : 'count',     index : 'count',     resizable : false, width : 65,  align: 'center', fixed : true, title : false}
+						             {name : 'count',     index : 'count',     resizable : false, width : 65,  align: 'center', fixed : true, title : false},
+						             {name : 'handled',   resizable : false, width : 20,  align: 'center', fixed : true, title : false, formatter : Vigu.Grid.handledFormatter}
 						           ],
 			            jsonReader : {
 			        	      root: "rows",
@@ -250,6 +251,22 @@ Vigu.Grid = (function($) {
 					day_diff == 1 && "Yesterday" ||
 					day_diff < 7 && day_diff + " days ago" ||
 					day_diff < 31 && Math.ceil( day_diff / 7 ) + " weeks ago";
+			}
+			return '';
+		},
+		/**
+		 * Formats the handled state
+		 *
+		 * @param {String} cellvalue The value to be formatted
+		 * @param {Object} options   Containing the row id and column id
+		 * @param {Object} rowObject Is a row data represented in the format determined from datatype option
+		 *
+		 * @return {String}
+		 * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:custom_formatter
+		 */
+		handledFormatter : function(cellvalue, options, rowObject) {
+			if (cellvalue == true) {
+				return '<span class="ui-icon ui-icon-check" title="This error is marked as handled."></span>';
 			}
 			return '';
 		},

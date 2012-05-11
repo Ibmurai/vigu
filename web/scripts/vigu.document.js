@@ -55,12 +55,13 @@ Vigu.Document = (function($) {
 			/**
 			 * Set the handled status for an error
 			 *
-			 * @param {boolean} handled Has this error been handled
-			 * @param {string}  key     The key of the error
+			 * @param {boolean}  handled   Has this error been handled
+			 * @param {string}   key       The key of the error
+			 * @param {function} onSuccess Call this when the request is successful.
 			 *
 			 * @return undefined
 			 */
-			setHandled : function(handled, key) {
+			setHandled : function(handled, key, onSuccess) {
 				var url = handled ? '/api/log/handle' : '/api/log/un_handle';
 				$.ajax({
 					url : url,
@@ -68,7 +69,8 @@ Vigu.Document = (function($) {
 					data: { key: key },
 					error : function() {
 						Vigu.notify('Setting the handled status failed');
-					}
+					},
+					success : onSuccess
 				});
 			},
 			/**
@@ -96,19 +98,14 @@ Vigu.Document = (function($) {
 					.addClass('ui-widget-header ui-corner-all ui-helper-clearfix messageTitle')
 					.append($('<label>')
 							.text('Handled').append($('<input type="checkbox">')
+								.attr('checked', data.handled == true ? 'checked' : null)
 								.change(function(){
 									if ($(this).is(':checked')) {
 										Vigu.notify('Error marked as handled');
-										Vigu.Document.setHandled(true, data.key);
-										if (!Vigu.Grid.parameters.handled) {
-											Vigu.Grid.reload();
-										}
+										Vigu.Document.setHandled(true, data.key, Vigu.Grid.reload);
 									} else {
 										Vigu.notify('Error unmarked as handled');
-										Vigu.Document.setHandled(false, data.key);
-										if (!Vigu.Grid.parameters.handled) {
-											Vigu.Grid.reload();
-										}
+										Vigu.Document.setHandled(false, data.key, Vigu.Grid.reload);
 									}
 								})))
 					.append($('<span>')
@@ -117,7 +114,7 @@ Vigu.Document = (function($) {
 					.appendTo(node);
 				var left = $('<div>').addClass('icons').appendTo(node);
 				var right = $('<div>').addClass('fields').appendTo(node);
-				$('<div>').addClass(level).addClass('errorLevel').appendTo(left);
+				$('<div>').addClass(level).addClass('error_level').appendTo(left);
 				$('<div>').addClass('count').text(data.count).appendTo(left);
 				var dl = $('<dl>');
 				$('<dt>').text('Last (First)').appendTo(dl);

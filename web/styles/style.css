@@ -100,7 +100,7 @@ div[role=region] div[role=heading] table {
 	border-spacing: 1px;
 }
 
-div.errorLevel {
+div.error_level {
 	height: 75px;
 	width: 75px;
 	margin: 0px;

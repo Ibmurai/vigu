@@ -58,6 +58,7 @@ class ApiPublicControllerLog extends ApiPublicController {
 					$line->getMessage(),
 					date('Y-m-d H:i:s', $line->getLast()),
 					$line->getCount(),
+					$line->isHandled(),
 				),
 			);
 
