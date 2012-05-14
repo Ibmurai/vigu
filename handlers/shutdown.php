@@ -109,18 +109,20 @@ class ViguErrorHandler {
 	}
 
 	/**
-	 * Handle any soft errors.
+	 * Handle any soft errors, ignoring @-suppressed errors.
 	 *
 	 * @param integer $errno      Error number.
 	 * @param string  $errstr     Message.
 	 * @param string  $errfile    File.
 	 * @param integer $errline    Line number.
-	 * @param array   $errcontext Ignored.
+	 * @param array   $errcontext The context when the error occured.
 	 *
-	 * @return boolean Returns false to continue error handling by other error handlers.
+	 * @return boolean Always returns false to continue error handling by other error handlers, and PHP itself.
 	 */
 	public static function error($errno = 0, $errstr = '', $errfile = '', $errline = 0, $errcontext = null) {
-		self::_logError($errno, $errstr, $errfile, $errline, $errcontext, debug_backtrace(false));
+		if (error_reporting() !== 0) {
+			self::_logError($errno, $errstr, $errfile, $errline, $errcontext, debug_backtrace(false));
+		}
 
 		return false;
 	}
