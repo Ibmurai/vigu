@@ -144,7 +144,8 @@ class ViguErrorHandler {
 			$exception->getTrace()
 		);
 
-		if (method_exists('Exception', 'getPrevious')) {
+		// Exceptions thrown in exception handlers are useless prior to 5.3.6, and <5.3 does not support inner exceptions.
+		if (defined('PHP_MAJOR_VERSION') && PHP_MAJOR_VERSION >= 5 && PHP_MINOR_VERSION >= 3 && PHP_RELEASE_VERSION >= 6) {
 			$ex = new Exception('Uncaught exception \'' . get_class($exception) . '\'', 42, $exception);
 			throw $ex;
 		} else {
