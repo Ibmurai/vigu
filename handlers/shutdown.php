@@ -144,7 +144,12 @@ class ViguErrorHandler {
 			$exception->getTrace()
 		);
 
-		throw $exception;
+		if (method_exists('Exception', 'getPrevious')) {
+			$ex = new Exception('Uncaught exception \'' . get_class($exception) . '\'', 42, $exception);
+			throw $ex;
+		} else {
+			trigger_error('Uncaught exception \'' . get_class($exception) . "' with message '{$exception->getMessage()}' in {$exception->getFile()} on line {$exception->getLine()}", E_USER_ERROR);
+		}
 	}
 
 	/**
