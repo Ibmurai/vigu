@@ -61,6 +61,13 @@ class ViguErrorHandler {
 	private static $_lastLoggedKey;
 
 	/**
+	 * True if this handler is enabled.
+	 *
+	 * @var boolean
+	 */
+	private static $_enabled = false;
+
+	/**
 	 * Read and parse vigu.ini.
 	 *
 	 * @return boolean True on success, false on failure.
@@ -75,10 +82,27 @@ class ViguErrorHandler {
 				trigger_error('Vigu shutdown handler could not determine the Redis connection data, from vigu.ini.', E_USER_NOTICE);
 				return false;
 			}
+
+			if (isset($config['enable_shutdown_handler']) && $config['enable_shutdown_handler'] == 1) {
+				self::$_enabled = true;
+			}
 			return true;
 		} else {
 			trigger_error('Vigu shutdown handler could not locate vigu.ini.', E_USER_NOTICE);
 			return false;
+		}
+	}
+
+	/**
+	 * Hooks the error, exception and shutdown handlers up, if the shutdown handler is enabled in vigu.ini.
+	 *
+	 * @return null
+	 */
+	public static function hookupIfEnabled() {
+		if (self::$_enabled) {
+			register_shutdown_function('ViguErrorHandler::shutdown');
+			set_error_handler('ViguErrorHandler::error');
+			set_exception_handler('ViguErrorHandler::exception');
 		}
 	}
 
@@ -381,9 +405,7 @@ class ViguErrorHandler {
 }
 
 if (ViguErrorHandler::readConfig()) {
-	register_shutdown_function('ViguErrorHandler::shutdown');
-	set_error_handler('ViguErrorHandler::error');
-	set_exception_handler('ViguErrorHandler::exception');
+	ViguErrorHandler::hookupIfEnabled();
 } else {
 	trigger_error('Vigu could not be configured. Data will not be gathered.', E_USER_WARNING);
 }
