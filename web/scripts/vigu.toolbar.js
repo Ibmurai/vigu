@@ -78,9 +78,7 @@ Vigu.Toolbar = (function($) {
 			}).appendTo(label);
 			$('<option>').attr('value', '').text('All').appendTo(select);
 			for (level in levels) {
-				var text = '' + levels[level].charAt(0).toUpperCase() + levels[level].toLowerCase().slice(1);
-				text = text.replace(' ', '&nbsp;');
-				$('<option>').attr('value', levels[level]).text(text).appendTo(select);
+				$('<option>').attr('value', levels[level]).text(levels[level]).appendTo(select);
 			}
 			label.appendTo(node);
 			select.selectmenu({format : Vigu.Grid.levelFormatter});

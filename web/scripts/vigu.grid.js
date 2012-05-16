@@ -213,12 +213,13 @@ Vigu.Grid = (function($) {
 		 */
 		levelFormatter : function(cellvalue, options, rowObject) {
 			if (cellvalue != null) {
+				var capitalized = cellvalue.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}).replace(/ /g, '&nbsp;');
 				var lower = cellvalue.toLowerCase();
 				var className = 'errorlevel_'+ lower.replace(' error', '_error')
 													.replace(' warning', '_warning')
 													.replace(' notice', '_notice')
 													.replace(' deprecated', '_deprecated');
-				return '<span class="'+ className +'">' + lower.charAt(0).toUpperCase() + lower.slice(1) + '</span>';
+				return '<span class="'+ className +'">' + capitalized + '</span>';
 			}
 			return '';
 		},
