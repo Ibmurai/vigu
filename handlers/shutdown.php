@@ -45,6 +45,20 @@ class ViguErrorHandler {
 		'_REQUEST',
 		'_ENV',
 	);
+	
+	/**
+	 * These errors will be caught at shutdown.
+	 *
+	 * @var integer[] 
+	 */
+	private static $_shutdownErrors = array(
+		E_ERROR,
+		E_PARSE,
+		E_CORE_ERROR,
+		E_CORE_WARNING,
+		E_COMPILE_ERROR,
+		E_COMPILE_WARNING
+	);
 
 	/**
 	 * Caches the host name.
@@ -115,7 +129,7 @@ class ViguErrorHandler {
 		$lastError = error_get_last();
 		$lastLoggedError = self::_getLastLoggedError();
 
-		if ($lastError && !preg_match('/^Uncaught exception /', $lastError['message'])) {
+		if ($lastError && in_array($lastError['type'], self::$_shutdownErrors) && !preg_match('/^Uncaught exception /', $lastError['message'])) {
 			// Make sure that the last error has not already been logged
 			if ($lastLoggedError
 				&& $lastError['file'] == $lastLoggedError['file']
