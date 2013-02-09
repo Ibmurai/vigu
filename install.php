@@ -17,7 +17,7 @@ $libs = array(
 	array(
 		'lib' => 'frood',
 		'url' => 'http://github.com/Ibmurai/frood.git',
-		'ver' => 'v.1.0'
+		'ver' => '1.2.1'
 	),
 	array(
 		'lib' => 'froodTwig',
@@ -26,8 +26,8 @@ $libs = array(
 	),
 	array(
 		'lib' => 'PHP-Daemon',
-		'url' => 'http://github.com/shaneharter/PHP-Daemon.git',
-		'ver' => 'origin/master'
+		'url' => 'https://github.com/akimsko/PHP-Daemon.git',
+		'ver' => 'vigu'
 	),
 	array(
 		'lib' => 'php-gearman-admin',

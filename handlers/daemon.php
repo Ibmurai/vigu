@@ -7,11 +7,10 @@
  * @license   http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
  */
 require_once dirname(__FILE__) . '/../lib/PHP-Daemon/Core/Daemon.php';
-require_once dirname(__FILE__) . '/../lib/PHP-Daemon/Core/PluginInterface.php';
-require_once dirname(__FILE__) . '/../lib/PHP-Daemon/Core/Lock/LockInterface.php';
+require_once dirname(__FILE__) . '/../lib/PHP-Daemon/Core/IPlugin.php';
 require_once dirname(__FILE__) . '/../lib/PHP-Daemon/Core/Lock/Lock.php';
 require_once dirname(__FILE__) . '/../lib/PHP-Daemon/Core/Lock/File.php';
-require_once dirname(__FILE__) . '/../lib/PHP-Daemon/Core/Plugins/Ini.php';
+require_once dirname(__FILE__) . '/../lib/PHP-Daemon/Core/Plugin/Ini.php';
 require_once dirname(__FILE__) . '/RedisFunctions.php';
 /**
  * The Vigu Daemon runs on the server, to process incoming errors.
@@ -39,23 +38,15 @@ class ViguDaemon extends Core_Daemon {
 		$this->loop_interval = 1.00;
 
 		// Set our Lock Provider
-		$this->lock = new Core_Lock_File();
+		$this->plugin('lock', new Core_Lock_File($this));
 		$this->lock->daemon_name = __CLASS__;
 		$this->lock->ttl = $this->loop_interval;
 		$this->lock->path = '/var/run/';
+		
+		$this->plugin('ini', new Core_Plugin_Ini());
+		$this->ini->filename = 'vigu.ini';
 
 		parent::__construct();
-	}
-
-	/**
-	 * Load plugins.
-	 *
-	 * @return null
-	 */
-	protected function load_plugins() {
-		// Use the INI plugin to provide an easy way to include config settings
-		$this->load_plugin('Ini');
-		$this->Ini->filename = 'vigu.ini';
 	}
 
 	/**
@@ -64,23 +55,23 @@ class ViguDaemon extends Core_Daemon {
 	 * @return null
 	 */
 	protected function setup() {
-		if (!isset($this->Ini['log'])) {
+		if (!isset($this->ini['log'])) {
 			$this->fatal_error('The configuration does not define the \'log\' setting.');
 		}
 
-		if (!isset($this->Ini['ttl'])) {
+		if (!isset($this->ini['ttl'])) {
 			$this->fatal_error('The configuration does not define the \'ttl\' setting.');
 		}
 
-		if (isset($this->Ini['redis'])) {
-			$this->_redis = new RedisFunctions($this->Ini['ttl'], $this->Ini['redis']['host'], $this->Ini['redis']['port'], $this->Ini['redis']['timeout']);
+		if (isset($this->ini['redis'])) {
+			$this->_redis = new RedisFunctions($this->ini['ttl'], $this->ini['redis']['host'], $this->ini['redis']['port'], $this->ini['redis']['timeout']);
 		} else {
 			$this->fatal_error('The configuration does not define a redis section.');
 		}
 
-		if ($this->is_parent) {
+		if ($this->is_parent()) {
 			$emails = array();
-			if (isset($this->Ini['emails'])) foreach ($this->Ini['emails'] as $email) {
+			if (isset($this->ini['emails'])) foreach ($this->ini['emails'] as $email) {
 				$emails[] = $email;
 				$this->log("Adding $email to notification list.");
 			}
@@ -109,7 +100,7 @@ class ViguDaemon extends Core_Daemon {
 			$this->_redis->processMultiple($this->_redis->getIncoming(2000));
 		}
 
-		if ($this->_upTime() - $lastCleanUpTime > $this->Ini['ttl']) {
+		if ($this->_upTime() - $lastCleanUpTime > $this->ini['ttl']) {
 			$this->_redis->cleanIndexes();
 			$lastCleanUpTime = $this->_upTime();
 		}
@@ -130,7 +121,7 @@ class ViguDaemon extends Core_Daemon {
 	 * @return string
 	 */
 	protected function log_file() {
-		return $this->Ini['log'];
+		return $this->ini['log'];
 	}
 }
 

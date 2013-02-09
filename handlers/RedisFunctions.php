@@ -74,8 +74,9 @@ class RedisFunctions {
 		$this->_redis = new Redis();
 		if (!$this->_redis->connect($this->_host, $this->_port, $this->_timeout)) {
 			unset($this->_redis);
+		} else {
+			$this->_redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
 		}
-		$this->_redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
 	}
 
 
