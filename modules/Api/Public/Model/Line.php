@@ -350,7 +350,8 @@ class ApiPublicModelLine extends ApiPublicModel {
 	private static function _getByPrefix($prefix, $offset, $limit, $path = null, $level = null, $handled = false) {
 		$redis = self::_getIndexingRedis();
 		$start = $offset;
-		$end   = $start + ($limit - 1);
+		// We fetch more results from redis than we need, in case we need to discard some of them
+		$end   = $start + $limit * 2;
 
 		$id = uniqid(self::SEARCH_PREFIX, true);
 
@@ -376,7 +377,19 @@ class ApiPublicModelLine extends ApiPublicModel {
 
 		$result = array();
 		foreach ($redis->zRevRange($id, $start, $end) as $key) {
-			$result[] = new ApiPublicModelLine($key);
+			try {
+				$modelLine = new ApiPublicModelLine($key);
+				$result[] = $modelLine;
+				if (count($result) >= $limit) {
+					// We don't need any more results
+					break;
+				}
+			} catch (RuntimeException $e) {
+				// Key not found, remove from indexes
+				foreach ($zinters as $inter) {
+					$redis->zRem($inter, $key);
+				}
+			}
 		}
 
 		$redis->del($id);
